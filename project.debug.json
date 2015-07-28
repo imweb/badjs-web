@@ -1,7 +1,7 @@
 {
     "port": 8081,
     "mysql" : {
-        "url" : "mysql://root:root@localhost:3306/badjs"
+        "url" : "mysql://root@localhost:3306/badjs"
     },
     "storage" : {
         "errorMsgTopUrl" : "http://127.0.0.1:9000/errorMsgTop",
