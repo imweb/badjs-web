@@ -101,6 +101,11 @@ module.exports = function(app){
         res.redirect(homeUrl);
     });
 
+    app.get('/errorMessageQuery',function(req,res){
+         var method = req.method.toLowerCase();
+	 var params = method == "post"?req.body:req.query;
+	 LogAction.queryLogCount(params,req,res);
+    })
 
     // 请求路径为： controller/xxxAction/xxx.do (get || post)
     app.use("/",function(req, res , next){
