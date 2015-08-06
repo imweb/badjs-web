@@ -34,27 +34,43 @@ var LogAction = {
         });
     },
     queryLogCount : function(params,req,res){
-        var logService = new LogService();
-	var logArr = [],errorArr = [],debugArr =[];
-
-        params['endDate'] -=0;
-        params['startDate'] -=0;
+        var logService = new LogService(),
+	    errorObj = {},resArr = [],
+            endDate = params['endDate'] -=0,
+            startDate = params['startDate'] -=0,
+	    contentVisable = params['content']||false;
         params['id'] -=0;
-        params['level'] = ['4','2','1'];
+        params['level'] = ['4'];
         delete params.user;
+        var timePeriod = (params['timePeriod']||1)*60000;
         logService.query(params,function(err, items){
             if(isError(res, err)){
                 return;
-            };
+            }
+            var timeCount = Math.ceil((endDate - startDate)/timePeriod);
 	    items.forEach(function(ele){
-	        switch(parseInt(ele.level)){
-                    case 1: debugArr.push(ele);break;
-                    case 2: logArr.push(ele);break;
-                    case 4: errorArr.push(ele);break;
+	        var date = Date.parse(ele.date);
+                for(var i =0 ; i<= timeCount;i++){
+                     var tag = startDate + i*timePeriod;
+		     errorObj[tag] = Array.isArray(errorObj[tag]) ? errorObj[tag] : [];
+		     if(date > tag&&date < startDate + (i+1)*timePeriod){
+                          errorObj[tag].push(ele);
+                     }
                 }
-            })
-
-            res.json({ret:0, msg:"success-query",count:items.length, errorCount: errorArr.length,data:{debug:debugArr,log:logArr,error:errorArr} });
+            });
+            for(var key in errorObj){
+                if(contentVisable){ 
+		    errorObj[key] = errorObj[key];
+                }else{
+		    var item = {
+			time: key,
+			errorCount: errorObj[key].length
+		    };
+		    resArr.push(item);
+		}
+            };
+	    var  resData = contentVisable?errorObj:resArr;
+            res.jsonp({ret:0,msg:'success-query',data:resData});
         });
     },
     code : function (params, req , res){
