@@ -10,6 +10,8 @@ var _ = require('underscore');
 var UserService = require('./UserService');
 var StatisticsService = require('./StatisticsService');
 var Exporting = require('node-highcharts-exporting');
+var path = require("path");
+var fs  = require("fs");
 
 var send_email = require("../utils/" + GLOBAL.pjconfig.email.module);
 var dateFormat = require("../utils/dateFormat");
@@ -66,20 +68,32 @@ var getImageData = function (name  , data){
             xAxis: {
                 categories: categories
             },
-            series: [{data: totalArray}]
+            series: [
+                {
+                    data: totalArray,
+                    name :"-"
+                }
+            ]
         },
 
         options : {
             title : {text : "The last 7 days line charts"} ,
             "yAxis" : {"title" : {"text": "total" }}
-        }
+        },
 
+
+        width : 800
 
     }
 }
 
+var encodeHtml = function (str) {
+    return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
+};
+
+
 EmailService.prototype = {
-    render: function(data ,imageData) {
+    render: function(data ,imagePath) {
         var that = this;
         data = data || {};
         var html = [];
@@ -96,7 +110,7 @@ EmailService.prototype = {
                     html.push('<tr style="background-color:{{bgc}}"><td style="padding:2px 0 2px 10px;border:1px solid #dedede">{{index}}</td><td style="padding:2px 0 2px 10px;border:1px solid #dedede">{{times}}</td><td style="padding:2px 0 2px 10px;border:1px solid #dedede">{{desc}}</td></tr>'
                         .replace(/{{index}}/g, i + 1)
                         .replace(/{{times}}/g, v.total)
-                        .replace(/{{desc}}/g, v.title)
+                        .replace(/{{desc}}/g,encodeHtml( v.title))
                         .replace(/{{bgc}}/g, i % 2 ? '#fff' : '#eee')
                     );
                     total_top += v.total;
@@ -110,9 +124,11 @@ EmailService.prototype = {
                 .replace(/{{per}}/g, (total_top * 100 / total).toFixed(2) + '%')
             );
 
-            if(imageData){
-                html.push("<p></p>")
-                html.push('<p><img src="data:image/png;base64,'+imageData+'"></p>');
+            if(imagePath){
+                html.push("<p>&nbsp;</p>")
+                html.push("<p>&nbsp;</p>")
+                html.push('<h4>最近7天图表统计</h4>')
+                html.push('<p><img src="http://badjs.server.com/'+imagePath+'"></p>');
             }
 
         } else {
@@ -146,7 +162,7 @@ EmailService.prototype = {
                     }
                 });
                 for (var applyId in orderByApplyId) {
-                    (function(users) {
+                    (function(users , applyId) {
                         var to_list = []; // 收件方
                         var cc_list = []; // 抄送方
                         var name = '';
@@ -154,6 +170,13 @@ EmailService.prototype = {
                             v.role === 0 ? cc_list.push(v.email) : to_list.push(v.email);
                             name = v.name;
                         }); // jshint ignore:line
+
+                 /*       if(applyId != 991){
+                            return ;
+                        }
+
+                        to_list = ["chriscai@tencent.com"];
+                        cc_list = [];*/
 
                         that.statisticsService.queryById({
                             top: that.top,
@@ -163,17 +186,17 @@ EmailService.prototype = {
                             if (err) return logger.error('Send email statisticsService queryById error');
                             if ( data &&  data.length > 0) {
 
-                              //  that.statisticsService.queryByChart({projectId : applyId , timeScope :1} , function (err , chartData){
+                                that.statisticsService.queryByChart({projectId : applyId , timeScope :1} , function (err , chartData){
 
-                                //    if(err || chartData.data.length <=0){
+                                    if(err || chartData.data.length <=0){
                                         that.sendEmail({
                                             to: to_list,
                                             cc: cc_list,
                                             title: name
                                         }, data[0]);
-                                 //   }else {
+                                    }else {
 
-                                   /*     Exporting(
+                                        Exporting(
                                             getImageData(name , chartData.data)
                                          , function (err , image){
 
@@ -185,23 +208,27 @@ EmailService.prototype = {
                                                     title: name
                                                 }, data[0]);
                                             }else {
-                                                that.sendEmail({
-                                                    to: to_list,
-                                                    cc: cc_list,
-                                                    title: name
-                                                }, data[0] , image);
+                                                var imagePath = "static/img/tmp/"  + (new Date -0 + applyId) + ".png";
+                                                fs.writeFile( path.join(__dirname , ".." ,  imagePath), new Buffer(image, 'base64'), function() {
+                                                    that.sendEmail({
+                                                        to: to_list,
+                                                        cc: cc_list,
+                                                        title: name,
+                                                        imagePath :imagePath
+                                                    }, data[0] );
+                                                });
+
                                             }
                                         });
-*/
-                                 //   }
+                                    }
 
-                               // })
+                               })
 
                             } else {
                                 logger.error('Send email data format error');
                             }
                         }); // jshint ignore:line
-                    })(orderByApplyId[applyId]); // jshint ignore:line
+                    })(orderByApplyId[applyId] , applyId); // jshint ignore:line
                 }
             }
         });
@@ -209,10 +236,10 @@ EmailService.prototype = {
             that.queryAll();
         }, 86400000);
     },
-    sendEmail: function(emails, data ) {
+    sendEmail: function(emails, data  ) {
         var title = "【BadJS 日报 " + dateFormat(this.date, "yyyy-MM-dd") + "】- " + emails.title;
         data.title = emails.title;
-        var content = this.render(data );
+        var content = this.render(data , emails.imagePath  );
         send_email(this.from, emails.to, emails.cc, title, content);
     },
     start: function() {
@@ -222,9 +249,9 @@ EmailService.prototype = {
         var time = GLOBAL.pjconfig.email.time.toString().split(':');
         date.setHours(parseInt(time[0], 10) || 9, parseInt(time[1], 10) || 0, parseInt(time[2], 10) || 0, 0);
         var timeDiff = date.valueOf() - (new Date()).valueOf();
-       setTimeout(function() {
+        setTimeout(function() {
             that.queryAll();
-       }, timeDiff);
+        }, timeDiff);
         logger.info('Email service will start after: ' + timeDiff);
     }
 };
