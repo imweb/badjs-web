@@ -21,6 +21,7 @@ var LogService = function (){
     //}*/
 
     this.queryUrl = GLOBAL.pjconfig.storage.queryUrl;
+    this.queryCountUrl = GLOBAL.pjconfig.strorage.queryCountUrl;
     this.pushProjectUrl = GLOBAL.pjconfig.acceptor.pushProjectUrl;
 
     logger.debug('query url : ' + this.queryUrl)
@@ -30,7 +31,7 @@ var LogService = function (){
 
 
 LogService.prototype = {
-    query : function (params , callback){
+    query : function (params , callback,isCount){
 
         var strParams = '';
         for(var key in params) {
@@ -43,7 +44,8 @@ LogService.prototype = {
         }
         strParams +='_=1';
         logger.debug('query param : ' +strParams );
-        http.get( this.queryUrl + '?'+ strParams , function (res){
+        var queryUrl = isCount?this.queryUrl:this.queryCountUrl;
+        http.get( queryUrl + '?'+ strParams , function (res){
             var buffer = '';
            res.on('data' , function (chunk){
                buffer += chunk.toString();
@@ -59,6 +61,9 @@ LogService.prototype = {
             logger.warn('error :' + err);
             callback(err)
         })
+    },
+    queryCount : function(params, callback){
+        this.query(params,callback,true);
     },
     pushProject : function (callback){
         var self = this;

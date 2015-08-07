@@ -5,7 +5,8 @@
     "storage" : {
         "errorMsgTopUrl" : "http://10.185.14.28:9000/errorMsgTop",
         "errorMsgTopCacheUrl" : "http://10.185.14.28:9000/errorMsgTopCache",
-        "queryUrl" : "http://10.185.14.28:9000/query"
+        "queryUrl" : "http://10.185.14.28:9000/query",
+        "queryConutUrl": "http://10.185.14.28:9000/queryCount"
     },
     "acceptor": {
         "pushProjectUrl" : "http://10.185.14.28:9001/getProjects"
