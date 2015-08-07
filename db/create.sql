@@ -10,11 +10,11 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
-CREATE DATABASE  IF NOT EXISTS `badjs` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `badjs`;
+/*CREATE DATABASE  IF NOT EXISTS `badjs` /*!40100 DEFAULT CHARACTER SET latin1 */;
+/*USE `badjs`;
 
 -- 导出  表 betterjs.b_statistics 结构
-DROP TABLE IF EXISTS `b_statistics`;
+DROP TABLE IF EXISTS `b_statistics`;*/
 CREATE TABLE IF NOT EXISTS `b_statistics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `projectId` int(11) DEFAULT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `b_statistics` (
 -- Table structure for table `b_apply`
 --
 
-DROP TABLE IF EXISTS `b_apply`;
+/*DROP TABLE IF EXISTS `b_apply`;*/
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `b_apply` (
@@ -51,7 +51,7 @@ CREATE TABLE `b_apply` (
 -- Table structure for table `b_approve`
 --
 
-DROP TABLE IF EXISTS `b_approve`;
+-- DROP TABLE IF EXISTS `b_approve`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `b_approve` (
@@ -70,7 +70,7 @@ CREATE TABLE `b_approve` (
 -- Table structure for table `b_user`
 --
 
-DROP TABLE IF EXISTS `b_user`;
+-- DROP TABLE IF EXISTS `b_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `b_user` (
@@ -95,7 +95,7 @@ INSERT INTO `b_user` (`id`, `loginName`, `chineseName`, `role`, `email`, `passwo
 -- Table structure for table `b_user_apply`
 --
 
-DROP TABLE IF EXISTS `b_user_apply`;
+-- DROP TABLE IF EXISTS `b_user_apply`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `b_user_apply` (
