@@ -21,7 +21,7 @@ var LogService = function (){
     //}*/
 
     this.queryUrl = GLOBAL.pjconfig.storage.queryUrl;
-    this.queryCountUrl = GLOBAL.pjconfig.strorage.queryCountUrl;
+    this.queryCountUrl = GLOBAL.pjconfig.storage.queryCountUrl;
     this.pushProjectUrl = GLOBAL.pjconfig.acceptor.pushProjectUrl;
 
     logger.debug('query url : ' + this.queryUrl)
@@ -44,7 +44,9 @@ LogService.prototype = {
         }
         strParams +='_=1';
         logger.debug('query param : ' +strParams );
-        var queryUrl = isCount?this.queryUrl:this.queryCountUrl;
+        console.log(isCount);
+        var queryUrl = isCount?this.queryCountUrl:this.queryUrl;
+        console.log(queryUrl);
         http.get( queryUrl + '?'+ strParams , function (res){
             var buffer = '';
            res.on('data' , function (chunk){

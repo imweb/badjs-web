@@ -34,7 +34,7 @@ var LogAction = {
             res.json({ret: 0, msg: "success-query", data: items});
         });
     },
-    queryLogCountOnly: function(){
+    queryLogCountOnly: function(params,req,res){
         var logService = new LogService();
 
         params['endDate'] -= 0;

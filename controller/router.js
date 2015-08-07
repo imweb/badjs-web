@@ -107,6 +107,12 @@ module.exports = function(app){
 	 LogAction.queryLogCount(params,req,res);
     })
 
+    app.get('/errorMessageQueryCount',function(req,res){
+        var method = req.method.toLowerCase();
+        var params = method == "post"?req.body:req.query;
+        LogAction.queryLogCountOnly(params,req,res);
+    })
+
     // 请求路径为： controller/xxxAction/xxx.do (get || post)
     app.use("/",function(req, res , next){
         //controller 请求action

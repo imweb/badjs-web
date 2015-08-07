@@ -6,7 +6,8 @@
     "storage" : {
         "errorMsgTopUrl" : "http://127.0.0.1:9000/errorMsgTop",
         "errorMsgTopCacheUrl" : "http://127.0.0.1:9000/errorMsgTopCache",
-        "queryUrl" : "http://127.0.0.1:9000/query"
+        "queryUrl" : "http://127.0.0.1:9000/query",
+        "queryCountUrl": "http://10.185.14.28:9000/queryCount"
     },
     "acceptor": {
         "pushProjectUrl" : "http://127.0.0.1:9001/getProjects"
