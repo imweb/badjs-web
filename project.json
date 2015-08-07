@@ -16,7 +16,7 @@
     },
     "email": {
         "homepage": "http://badjs.sng.local/user/index.html",
-        "from": "noreply-badjs@tencent.com",
+        "from": "badjs-vip@tencent.com",
         "emailSuffix" : "@tencent.com",
         "time": "09:00:00",
         "top": 20,
