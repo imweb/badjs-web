@@ -53,6 +53,7 @@ LogService.prototype = {
                buffer += chunk.toString();
            }).on('end' , function (){
                try{
+                   console.log(JSON.parse(buffer));
                     callback(null , JSON.parse(buffer))
                }catch(e){
                    callback(e);
