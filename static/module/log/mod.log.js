@@ -1,4 +1,5 @@
 var Dialog = require("dialog/dialog");
+var Chart = require("charts/highcharts");
 var Delegator = require("delegator");
 
 var logTable = require("./template/logTable.ejs");
@@ -84,6 +85,18 @@ function bindEvent() {
                 showLogs(logConfig, false);
             }
 
+        })
+        .on('click','showCharts',function(){
+            var startTime = $('#startTime').val(),
+                endTime = $('#endTime').val();
+            //console.log('data', endTime);
+            logConfig.startDate = startTime == '' ? new Date().getTime() - maxDate : new Date(startTime).getTime();
+            logConfig.endDate = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
+            //console.log('data', logConfig);
+            //测试时间是否符合
+            if (isTimeRight(logConfig.startDate, logConfig.endDate)) {
+                showCharts(logConfig);
+            }
         })
         .on('click', 'showSource', function (e, data) {
             // 内网服务器，拉取不到 外网数据,所以屏蔽掉请求
@@ -229,6 +242,44 @@ function showLogs(opts, isAdd) {
             loading = false;
         }
     });
+}
+
+function showCharts(opts){
+    if (opts.id <= 0 || loading) {
+        !loading && Dialog({
+            header: '警告',
+            body: '请选择一个项目'
+        });
+        return;
+    }
+
+    loading = true;
+
+    var url = "/errorMessageQueryCount";
+    $.ajax({
+        url:url,
+        data:{
+            id: opts.id,
+            startDate: opts.startDate,
+            endDate: opts.endDate,
+            history: 1
+        },
+        success: function(data){
+            chartInit(data);
+            loading = false;
+        },
+        error: function(){
+            loading = false;
+        }
+
+    })
+}
+
+function chartInit(data){
+    $('.main-table').hide();
+    $('.main-mid').highcharts(
+
+    )
 }
 
 function init() {

@@ -34,20 +34,37 @@ var LogAction = {
             res.json({ret: 0, msg: "success-query", data: items});
         });
     },
-    queryLogCountOnly: function(params,req,res){
-        var logService = new LogService();
-
-        params['endDate'] -= 0;
-        params['startDate'] -= 0;
+    queryLogCountOnly: function (params, req, res) {
+        var logService = new LogService(),
+            endDate = params['endDate'] -= 0,
+            startDate = params['startDate'] -= 0,
+            timePeriod = (params['timePeriod'] || 1) * 60000,
+            resultArr = [];
         params['id'] -= 0;
+        params['level'] = params['level'] || ['4'];
         delete params.user;
         logService.queryCount(params, function (err, items) {
             if (isError(res, err)) {
                 return;
             }
-            ;
-
-            res.json({ret: 0, msg: "success-query", data: items});
+            var timeCount = Math.ceil((endDate - startDate) / timePeriod) + 1;
+            for (; timeCount--;) {
+                var tag = startDate + timeCount * timePeriod;
+                var obj = {};
+                obj.time = tag;
+                obj.count = 0;
+                while (items.length) {
+                    var data = items.pop();
+                    if (tag - data.time < timePeriod && tag - data.time >= 0) {
+                        obj.count += parseInt(data.count);
+                    } else {
+                        items.push(data);
+                        break;
+                    }
+                }
+                resultArr.push(obj);
+            }
+            res.json({ret: 0, msg: "success-query", data: resultArr.reverse()});
         });
     },
     queryLogCount: function (params, req, res) {
