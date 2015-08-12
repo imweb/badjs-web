@@ -32,7 +32,10 @@ function addKeyword() {
     var value = $.trim($('#keyword-ipt').val());
     if (value !== '') {
         if (!removeValue(value, logConfig.include)) {
-            $('#keyword-group').append(keyword( { it : { value: value } , opt: { encodeHtml: encodeHtml, set: Delegator.set }}));
+            $('#keyword-group').append(keyword({
+                it: {value: value},
+                opt: {encodeHtml: encodeHtml, set: Delegator.set}
+            }));
         }
         logConfig.include.push(value);
         $('#keyword-ipt').val('');
@@ -43,7 +46,7 @@ function addDebar() {
     var value = $.trim($('#debar-ipt').val());
     if (value !== '') {
         if (!removeValue(value, logConfig.exclude)) {
-            $('#debar-group').append(debar( { it : { value: value } , opt: { encodeHtml: encodeHtml, set: Delegator.set }}));
+            $('#debar-group').append(debar({it: {value: value}, opt: {encodeHtml: encodeHtml, set: Delegator.set}}));
         }
         logConfig.exclude.push(value);
         $('#debar-ipt').val('');
@@ -86,7 +89,7 @@ function bindEvent() {
             }
 
         })
-        .on('click','showCharts',function(){
+        .on('click', 'showCharts', function () {
             var startTime = $('#startTime').val(),
                 endTime = $('#endTime').val();
             //console.log('data', endTime);
@@ -226,9 +229,9 @@ function showLogs(opts, isAdd) {
                 }
 
                 if (isAdd) {
-                    $('#log-table').append(logTable({it : data.data , opt : param}));
+                    $('#log-table').append(logTable({it: data.data, opt: param}));
                 } else {
-                    $('#log-table').html(logTable({it : data.data , opt : param}));
+                    $('#log-table').html(logTable({it: data.data, opt: param}));
                 }
 
                 currentIndex++;
@@ -244,7 +247,7 @@ function showLogs(opts, isAdd) {
     });
 }
 
-function showCharts(opts){
+function showCharts(opts) {
     if (opts.id <= 0 || loading) {
         !loading && Dialog({
             header: '警告',
@@ -257,29 +260,94 @@ function showCharts(opts){
 
     var url = "/errorMessageQueryCount";
     $.ajax({
-        url:url,
-        data:{
+        url: url,
+        data: {
             id: opts.id,
             startDate: opts.startDate,
             endDate: opts.endDate,
             history: 1
         },
-        success: function(data){
+        success: function (data) {
             chartInit(data);
             loading = false;
         },
-        error: function(){
+        error: function () {
             loading = false;
         }
 
     })
 }
 
-function chartInit(data){
+function chartInit(result) {
+    var countArr = [],
+        timeArr = [],
+        getTime = (function () {
+            var dateString;
+            return function (date, type) {
+                var date = new Date(date);
+                switch (type) {
+                    case 'time' :
+                        dateString = date.getHours() + ":" + date.getMinutes();
+                        break;
+                    case 'date' :
+                        dateString = date.getMonth() + '-' + date.getDate();
+                        break;
+                    case 'datetime' :
+                        dateString = date.getHours() + ":" + date.getMinutes() + ' ' + date.getMonth() + '-' + date.getDate();
+                }
+                return dateString;
+            }
+        })();
+    if (Array.isArray(result.data)) {
+        var data = result.data;
+        for (var l = data.length; l--;) {
+            countArr.push(data[l].count);
+            timeArr.push(getTime(data[l].time, 'time'));
+        }
+    }
+    countArr.reverse();
+    timeArr.reverse();
     $('.main-table').hide();
-    $('.main-mid').highcharts(
-
-    )
+    $('.main-mid').highcharts({
+        chart: {
+            type: 'spline'
+        },
+        title: {
+            text: '错误数据统计'
+        },
+        subtitle: {
+            text: '数据量'
+        },
+        xAxis: {
+            categories: timeArr
+        },
+        yAxis: {
+            title: {
+                text: '错误量'
+            }
+        },
+        tooltip: {
+            enabled: true,
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br>' + this.x + ': ' + this.y;
+            }
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: true
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: '7-11',
+            data: countArr
+        }]
+    })
 }
 
 function init() {
