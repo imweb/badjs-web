@@ -268,6 +268,8 @@ function showCharts(opts) {
             history: 1
         },
         success: function (data) {
+            console.log("1");
+            console.log(data);
             chartInit(data);
             loading = false;
         },
@@ -279,8 +281,9 @@ function showCharts(opts) {
 }
 
 function chartInit(result) {
-    var countArr = [],
-        timeArr = [],
+    console.log(2);
+    console.log(result);
+    var resultArr = [],timeArr=[],
         getTime = (function () {
             var dateString;
             return function (date, type) {
@@ -297,16 +300,29 @@ function chartInit(result) {
                 }
                 return dateString;
             }
-        })();
-    if (Array.isArray(result.data)) {
-        var data = result.data;
-        for (var l = data.length; l--;) {
-            countArr.push(data[l].count);
-            timeArr.push(getTime(data[l].time, 'time'));
-        }
-    }
-    countArr.reverse();
-    timeArr.reverse();
+        })(),
+        formatArr = function(arr,isTime,isSvg){
+            var countObj = {};
+            countObj.name = isSvg?'五日均值':getTime(arr[0].time,'date');
+            countObj.data = [];
+            for (var l = arr.length; l--;) {
+                countObj.data.push(arr[l].count);
+                if(isTime){timeArr.push(getTime(arr[l].time, 'time'));}
+            }
+            countObj.data.reverse();
+            return countObj;
+        },
+        getArray = function (result) {
+            console.log("3");
+            console.log(result);
+            var resultArr =[];
+            resultArr.push(formatArr(result.data,true,false));
+            resultArr.push(formatArr(result.history,false,false));
+            resultArr.push(formatArr(result.svg,false,true));
+            timeArr.reverse();
+            return resultArr;
+        };
+    resultArr = getArray(result);
     $('.main-table').hide();
     $('.main-mid').highcharts({
         chart: {
@@ -343,10 +359,7 @@ function chartInit(result) {
         credits: {
             enabled: false
         },
-        series: [{
-            name: '7-11',
-            data: countArr
-        }]
+        series: resultArr
     })
 }
 

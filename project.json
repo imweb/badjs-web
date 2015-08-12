@@ -6,7 +6,8 @@
         "errorMsgTopUrl" : "http://10.185.14.28:9000/errorMsgTop",
         "errorMsgTopCacheUrl" : "http://10.185.14.28:9000/errorMsgTopCache",
         "queryUrl" : "http://10.185.14.28:9000/query",
-        "queryCountUrl": "http://10.185.14.28:9000/queryCount"
+        "queryCountUrl": "http://10.185.14.28:9000/queryCount",
+        "querySvgUrl": "http://10.185.14.28:9000/errorCountSvg"
     },
     "acceptor": {
         "pushProjectUrl" : "http://10.185.14.28:9001/getProjects"

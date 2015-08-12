@@ -10,18 +10,18 @@ var log4js = require('log4js'),
     logger = log4js.getLogger();
 
 
+var LogService = function () {
 
-var LogService = function (){
-
-   /* if(GLOBAL.DEBUG){
-        this.queryUrl = 'http://localhost:9000/query';
-    }else {
-        this.queryUrl = 'http://10.143.132.205:9000/query';
-        this.pushProjectUrl = 'http://10.143.132.205:9001/getProjects';
-    //}*/
+    /* if(GLOBAL.DEBUG){
+     this.queryUrl = 'http://localhost:9000/query';
+     }else {
+     this.queryUrl = 'http://10.143.132.205:9000/query';
+     this.pushProjectUrl = 'http://10.143.132.205:9001/getProjects';
+     //}*/
 
     this.queryUrl = GLOBAL.pjconfig.storage.queryUrl;
     this.queryCountUrl = GLOBAL.pjconfig.storage.queryCountUrl;
+    this.querySvgUrl = GLOBAL.pjconfig.storage.querySvgUrl;
     this.pushProjectUrl = GLOBAL.pjconfig.acceptor.pushProjectUrl;
 
     logger.debug('query url : ' + this.queryUrl)
@@ -29,83 +29,95 @@ var LogService = function (){
 }
 
 
-
 LogService.prototype = {
-    query : function (params , callback,isCount){
+    query: function (params, callback, type) {
 
-        var strParams = '';
-        for(var key in params) {
-            if(key == 'index'){
-                strParams += key +'='+ params[key]  + '&';
-            }else {
-                strParams += key +'='+ JSON.stringify(params[key] ) + '&';
+        var strParams = '', queryUrl = '';
+        for (var key in params) {
+            if (key == 'index') {
+                strParams += key + '=' + params[key] + '&';
+            } else {
+                strParams += key + '=' + JSON.stringify(params[key]) + '&';
 
             }
         }
-        strParams +='_=1';
-        logger.debug('query param : ' +strParams );
-        console.log(isCount);
-        var queryUrl = isCount?this.queryCountUrl:this.queryUrl;
+        strParams += '_=1';
+        logger.debug('query param : ' + strParams);
+        switch (type) {
+            case 'svg':
+                queryUrl = this.querySvgUrl;
+                break;
+            case 'count' :
+                queryUrl = this.queryCountUrl;
+                break;
+            default :
+                queryUrl = this.queryUrl;
+        }
         console.log(queryUrl);
-        http.get( queryUrl + '?'+ strParams , function (res){
+        http.get(queryUrl + '?' + strParams, function (res) {
             var buffer = '';
-           res.on('data' , function (chunk){
-               buffer += chunk.toString();
-           }).on('end' , function (){
-               try{
-                   console.log(JSON.parse(buffer));
-                    callback(null , JSON.parse(buffer))
-               }catch(e){
-                   callback(e);
-               }
-           })
+            res.on('data', function (chunk) {
+                buffer += chunk.toString();
+            }).on('end', function () {
+                try {
+                    console.log(JSON.parse(buffer));
+                    callback(null, JSON.parse(buffer))
+                } catch (e) {
+                    callback(e);
+                }
+            })
 
-        }).on('error' , function (err){
+        }).on('error', function (err) {
             logger.warn('error :' + err);
             callback(err)
         })
     },
-    queryCount : function(params, callback){
-        this.query(params,callback,true);
+    queryCount: function (params, callback) {
+        this.query(params, callback, 'count');
     },
-    pushProject : function (callback){
+    queryHistorySvg: function (params, callback) {
+        this.query(params, callback, 'svg');
+    },
+    pushProject: function (callback) {
         var self = this;
 
-        callback || (callback = function (){});
+        callback || (callback = function () {
+        });
 
-        var businessService   = new BusinessService();
+        var businessService = new BusinessService();
 
         var tryTimes = 0;
-        var push = function (){
+        var push = function () {
 
-            businessService.findBusiness(function (err , item){
+            businessService.findBusiness(function (err, item) {
 
                 var strParams = '';
 
-                _.each( item , function (value , ke){
-                    strParams+=value.id+"_";
+                _.each(item, function (value, ke) {
+                    strParams += value.id + "_";
                 });
 
-                if(strParams.length >0){
-                    strParams = "projectsId="+strParams.substring(0 , strParams.length-1   ) + "&";
+                if (strParams.length > 0) {
+                    strParams = "projectsId=" + strParams.substring(0, strParams.length - 1) + "&";
                 }
 
-                strParams +="auth=badjsAccepter";
+                strParams += "auth=badjsAccepter";
 
 
-                http.get( self.pushProjectUrl + '?' + strParams , function (res){
+                http.get(self.pushProjectUrl + '?' + strParams, function (res) {
                     res
-                        .on('data' , function (){})
-                        .on('end' , function (){
-                        callback();
-                    })
+                        .on('data', function () {
+                        })
+                        .on('end', function () {
+                            callback();
+                        })
 
-                }).on('error' , function (err){
-                    if(tryTimes <=3 ){
+                }).on('error', function (err) {
+                    if (tryTimes <= 3) {
                         tryTimes++;
                         logger.warn('push project error and try:' + err);
                         push();
-                    }else {
+                    } else {
                         logger.warn('push project error :' + err);
                         callback(err)
                     }
@@ -121,5 +133,5 @@ LogService.prototype = {
 }
 
 
-module.exports =  LogService;
+module.exports = LogService;
 
