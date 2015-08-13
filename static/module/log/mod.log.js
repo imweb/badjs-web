@@ -279,7 +279,7 @@ function showCharts(opts) {
 }
 
 function chartInit(result) {
-    var resultArr = [],timeArr=[],
+    var resultArr = [], timeArr = [],
         getTime = (function () {
             var dateString;
             return function (date, type) {
@@ -297,22 +297,26 @@ function chartInit(result) {
                 return dateString;
             }
         })(),
-        formatArr = function(arr,isTime,isSvg){
+        formatArr = function (arr, isTime, isSvg) {
             var countObj = {};
-            countObj.name = isSvg?'五日均值':getTime(arr[0].time,'date');
+            countObj.name = isSvg ? '五日均值' : getTime(arr[0].time, 'date');
             countObj.data = [];
             for (var l = arr.length; l--;) {
                 countObj.data.push(arr[l].count);
-                if(isTime){timeArr.push(getTime(arr[l].time, 'time'));}
+                if (isTime) {
+                    timeArr.push(getTime(arr[l].time, 'time'));
+                }
             }
             countObj.data.reverse();
             return countObj;
         },
         getArray = function (result) {
-            var resultArr =[];
-            resultArr.push(formatArr(result.data,true,false));
-            resultArr.push(formatArr(result.history,false,false));
-            resultArr.push(formatArr(result.svg,false,true));
+            var resultArr = [];
+            resultArr.push(formatArr(result.data, true, false));
+            resultArr.push(formatArr(result.history, false, false));
+            if (result.svg) {
+                resultArr.push(formatArr(result.svg, false, true));
+            }
             timeArr.reverse();
             return resultArr;
         };
