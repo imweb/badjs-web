@@ -114,7 +114,7 @@ module.exports = function(app){
         LogAction.queryLogCountOnly(params,req,res);
     });
 
-    app.get('/errorMessageSvgCount',function(){
+    app.get('/errorMessageSvgCount',function(req,res){
         logger.debug('web query start'+ Date.now());
         var method = req.method.toLowerCase();
         var params = method == "post"?req.body:req.query;
