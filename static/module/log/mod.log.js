@@ -190,7 +190,8 @@ function removeValue(value, arr) {
 
 
 function showLogs(opts, isAdd) {
-
+    $('.main-table').show();
+    $('#chart-container').remove();
     if (opts.id <= 0 || loading) {
         !loading && Dialog({
             header: '警告',
@@ -258,7 +259,9 @@ function showCharts(opts) {
 
     loading = true;
 
-    var url = "/errorMessageQueryCount";
+    var url = "/errorMessageQueryCount",
+        svgUrl = '/errorMessageSvgCount',
+        chart;
     $.ajax({
         url: url,
         data: {
@@ -268,7 +271,7 @@ function showCharts(opts) {
             history: 1
         },
         success: function (data) {
-            chartInit(data);
+            chart = chartInit(data);
             loading = false;
         },
         error: function () {
@@ -276,6 +279,11 @@ function showCharts(opts) {
         }
 
     })
+
+    $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate}, function (data) {
+        chart.addSeries(data,false);
+        chart.redraw();
+    });
 }
 
 function chartInit(result) {
@@ -322,7 +330,11 @@ function chartInit(result) {
         };
     resultArr = getArray(result);
     $('.main-table').hide();
-    $('.main-mid').highcharts({
+    var box = $('.main-mid'), container = $('#chart-container');
+    if (!box.contains(container)) {
+        box.append('<div id="chart-container"></div>');
+    }
+    container.highcharts({
         chart: {
             type: 'spline'
         },
@@ -358,7 +370,8 @@ function chartInit(result) {
             enabled: false
         },
         series: resultArr
-    })
+    });
+    return container.highcharts();
 }
 
 function init() {
