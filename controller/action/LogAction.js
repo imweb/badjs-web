@@ -71,26 +71,42 @@ var LogAction = {
             }
             resObj.data = formatArray(items, timePeriod, startDate, endDate) || [];
             if (history) {
-                logService.queryHistorySvg(params,function(err, svgitems) {
+
+                var historyEnd = params['endDate'] = params['endDate'] - 24 * 60 * 60 * 1000,
+                    historyStart = params['startDate'] = params['startDate'] - 24 * 60 * 60 * 1000;
+                logService.queryCount(params, function (err, hisitems) {
                     if (isError(res, err)) {
                         return;
                     }
-                    resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate) || [];
-                    var historyEnd = params['endDate'] = params['endDate'] - 24 * 60 * 60 * 1000,
-                        historyStart = params['startDate'] = params['startDate'] - 24 * 60 * 60 * 1000;
-                    logService.queryCount(params, function (err, hisitems) {
-                        if (isError(res, err)) {
-                            return;
-                        }
-                        resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd) || [];
-                        res.jsonp(resObj);
-                    });
+                    resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd) || [];
+                    logger.debug('web query end'+ Date.now());
+                    res.jsonp(resObj);
                 });
 
             } else {
+                logger.debug('web query end'+ Date.now());
                 res.jsonp(resObj);
             }
         });
+    },
+    querySvgCount: function (params, req, res) {
+        var logService = new LogService(),
+            endDate = params['endDate'] -= 0,
+            startDate = params['startDate'] -= 0,
+            timePeriod = (params['timePeriod'] || 1) * 60000,
+            resObj = {ret: 0, msg: "success-query"},
+            history = params['history'] || 0;
+        params['id'] -= 0;
+        params['level'] = params['level'] || ['4'];
+        delete params.user;
+        logService.queryHistorySvg(params, function (err, svgitems) {
+            if (isError(res, err)) {
+                return;
+            }
+            resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate) || [];
+            logger.debug('web query end'+ Date.now());
+            res.jsonp(resObj);
+        })
     },
     queryLogCount: function (params, req, res) {
         var logService = new LogService(),

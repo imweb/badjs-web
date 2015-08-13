@@ -105,13 +105,21 @@ module.exports = function(app){
          var method = req.method.toLowerCase();
 	 var params = method == "post"?req.body:req.query;
 	 LogAction.queryLogCount(params,req,res);
-    })
+    });
 
     app.get('/errorMessageQueryCount',function(req,res){
+        logger.debug('web query start'+ Date.now());
         var method = req.method.toLowerCase();
         var params = method == "post"?req.body:req.query;
         LogAction.queryLogCountOnly(params,req,res);
-    })
+    });
+
+    app.get('/errorMessageSvgCount',function(){
+        logger.debug('web query start'+ Date.now());
+        var method = req.method.toLowerCase();
+        var params = method == "post"?req.body:req.query;
+        LogAction.querySvgCount(params,req,res);
+    });
 
     // 请求路径为： controller/xxxAction/xxx.do (get || post)
     app.use("/",function(req, res , next){
