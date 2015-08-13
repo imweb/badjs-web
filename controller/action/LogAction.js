@@ -62,7 +62,6 @@ var LogAction = {
             timePeriod = (params['timePeriod'] || 1) * 60000,
             resObj = {ret: 0, msg: "success-query"},
             history = params['history'] || 0;
-        console.log("history is" + history);
         params['id'] -= 0;
         params['level'] = params['level'] || ['4'];
         delete params.user;
@@ -77,8 +76,6 @@ var LogAction = {
                     if (isError(res, err)) {
                         return;
                     }
-                    console.log("svg");
-                    console.log(svgitems);
                     resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate) || [];
                     var historyEnd = params['endDate'] = params['endDate'] - 24 * 60 * 60 * 1000,
                         historyStart = params['startDate'] = params['startDate'] - 24 * 60 * 60 * 1000;
@@ -92,7 +89,6 @@ var LogAction = {
                 });
 
             } else {
-                console.log(resObj);
                 res.jsonp(resObj);
             }
         });

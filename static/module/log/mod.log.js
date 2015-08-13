@@ -268,8 +268,6 @@ function showCharts(opts) {
             history: 1
         },
         success: function (data) {
-            console.log("1");
-            console.log(data);
             chartInit(data);
             loading = false;
         },
@@ -281,8 +279,6 @@ function showCharts(opts) {
 }
 
 function chartInit(result) {
-    console.log(2);
-    console.log(result);
     var resultArr = [],timeArr=[],
         getTime = (function () {
             var dateString;
@@ -313,8 +309,6 @@ function chartInit(result) {
             return countObj;
         },
         getArray = function (result) {
-            console.log("3");
-            console.log(result);
             var resultArr =[];
             resultArr.push(formatArr(result.data,true,false));
             resultArr.push(formatArr(result.history,false,false));
