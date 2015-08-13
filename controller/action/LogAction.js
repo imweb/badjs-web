@@ -69,7 +69,6 @@ var LogAction = {
             if (isError(res, err)) {
                 return;
             }
-            console.log(items);
             resObj.data = formatArray(items, timePeriod, startDate, endDate) || [];
             if (history) {
                 logService.queryHistorySvg(params,function(err, svgitems) {
