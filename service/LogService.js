@@ -53,14 +53,13 @@ LogService.prototype = {
             default :
                 queryUrl = this.queryUrl;
         }
-        console.log(queryUrl);
+        logger.info('the query url is '+queryUrl);
         http.get(queryUrl + '?' + strParams, function (res) {
             var buffer = '';
             res.on('data', function (chunk) {
                 buffer += chunk.toString();
             }).on('end', function () {
                 try {
-                    logger.debug(JSON.parse(buffer));
                     callback(null, JSON.parse(buffer))
                 } catch (e) {
                     callback(e);

@@ -23,7 +23,8 @@ var logConfig = {
     };
 
 
-var maxDate = 60 * 60 * 1000 * 24 * 2;
+var maxDate = 60 * 60 * 1000 * 24 * 2,
+    onDate = 60*60*1000*24;
 
 
 var currentSelectId = -1, currentIndex = 0, noData = false, MAX_LIMIT = 500, loading = false;
@@ -163,7 +164,7 @@ function bindEvent() {
 
 }
 
-function isTimeRight(begin, end) {
+function isTimeRight(begin, end,isChart) {
     if (begin > end) {
         Dialog({
             header: '时间范围错误',
@@ -176,6 +177,13 @@ function isTimeRight(begin, end) {
             body: '结束时间和开始时间间隔需在三天之内！'
         });
         return false;
+    }else if(isChart){
+        if(end - onDate > begin){
+            Dialog({
+                header: '时间范围错误',
+                body: '图表时间范围请控制在一天之内！'
+            });
+        }
     }
     return true;
 
