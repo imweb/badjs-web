@@ -98,7 +98,7 @@ function bindEvent() {
             logConfig.endDate = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
             //console.log('data', logConfig);
             //测试时间是否符合
-            if (isTimeRight(logConfig.startDate, logConfig.endDate)) {
+            if (isTimeRight(logConfig.startDate, logConfig.endDate,true)) {
                 showCharts(logConfig);
             }
         })
