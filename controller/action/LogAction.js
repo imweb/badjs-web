@@ -71,20 +71,20 @@ var LogAction = {
             }
             resObj.data = formatArray(items, timePeriod, startDate, endDate) || [];
             if (history) {
-
-                var historyEnd = params['endDate'] = params['endDate'] - 24 * 60 * 60 * 1000,
-                    historyStart = params['startDate'] = params['startDate'] - 24 * 60 * 60 * 1000;
+                var oneDay = 24*60*60*1000,
+                    historyEnd = params['endDate'] = params['endDate'] - oneDay,
+                    historyStart = params['startDate'] = params['startDate'] - oneDay;
                 logService.queryCount(params, function (err, hisitems) {
                     if (isError(res, err)) {
                         return;
                     }
                     resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd) || [];
-                    logger.debug('web query end'+ Date.now());
+                    logger.info('web query end'+ Date.now());
                     res.jsonp(resObj);
                 });
 
             } else {
-                logger.debug('web query end'+ Date.now());
+                logger.info('web query end'+ Date.now());
                 res.jsonp(resObj);
             }
         });
@@ -103,8 +103,9 @@ var LogAction = {
             if (isError(res, err)) {
                 return;
             }
+            logger.debug(svgitems);
             resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate) || [];
-            logger.debug('web query end'+ Date.now());
+            logger.info('web query end'+ Date.now());
             res.jsonp(resObj);
         })
     },

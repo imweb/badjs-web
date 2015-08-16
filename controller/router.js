@@ -40,9 +40,6 @@ module.exports = function(app){
     } );
 
 
-
-
-
     app.get('/user/apply.html', function(req, res){
         var user  = req.session.user;
         if(req.query && req.query.applyId){
@@ -101,21 +98,20 @@ module.exports = function(app){
         res.redirect(homeUrl);
     });
 
+    //查询接口
     app.get('/errorMessageQuery',function(req,res){
          var method = req.method.toLowerCase();
 	 var params = method == "post"?req.body:req.query;
 	 LogAction.queryLogCount(params,req,res);
     });
-
     app.get('/errorMessageQueryCount',function(req,res){
-        logger.debug('web query start'+ Date.now());
+        logger.info('web query start'+ Date.now());
         var method = req.method.toLowerCase();
         var params = method == "post"?req.body:req.query;
         LogAction.queryLogCountOnly(params,req,res);
     });
-
     app.get('/errorMessageSvgCount',function(req,res){
-        logger.debug('web query start'+ Date.now());
+        logger.info('web query start'+ Date.now());
         var method = req.method.toLowerCase();
         var params = method == "post"?req.body:req.query;
         LogAction.querySvgCount(params,req,res);
