@@ -24,7 +24,7 @@ var logConfig = {
 
 
 var maxDate = 60 * 60 * 1000 * 24 * 2,
-    onDate = 60*60*1000*24;
+    onDate = 60 * 60 * 1000 * 24;
 
 
 var currentSelectId = -1, currentIndex = 0, noData = false, MAX_LIMIT = 500, loading = false;
@@ -98,7 +98,7 @@ function bindEvent() {
             logConfig.endDate = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
             //console.log('data', logConfig);
             //测试时间是否符合
-            if (isTimeRight(logConfig.startDate, logConfig.endDate,true)) {
+            if (isTimeRight(logConfig.startDate, logConfig.endDate, true)) {
                 showCharts(logConfig);
             }
         })
@@ -164,7 +164,7 @@ function bindEvent() {
 
 }
 
-function isTimeRight(begin, end,isChart) {
+function isTimeRight(begin, end, isChart) {
     if (begin > end) {
         Dialog({
             header: '时间范围错误',
@@ -177,8 +177,8 @@ function isTimeRight(begin, end,isChart) {
             body: '结束时间和开始时间间隔需在三天之内！'
         });
         return false;
-    }else if(isChart){
-        if(end - onDate > begin){
+    } else if (isChart) {
+        if (end - onDate > begin) {
             Dialog({
                 header: '时间范围错误',
                 body: '图表时间范围请控制在一天之内！'
@@ -288,8 +288,12 @@ function showCharts(opts) {
 
     })
 
-    $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate}, function (data) {
-        chart.addSeries(data,false);
+    $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
+        data = {
+            name:'五日均值线',
+            data:data
+        };
+        chart.addSeries(data, false);
         chart.redraw();
     });
 }

@@ -15,7 +15,7 @@ var LogService = require('../../service/LogService'),
         }
         return false;
     };
-var formatArray = function (items, timePeriod, startDate, endDate) {
+var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime) {
     var resultArr = [];
     var timeCount = Math.ceil((endDate - startDate) / timePeriod) + 1;
     for (; timeCount--;) {
@@ -32,7 +32,12 @@ var formatArray = function (items, timePeriod, startDate, endDate) {
                 break;
             }
         }
-        resultArr.push(returnObj);
+        if (isNotWithTime) {
+            resultArr.push(returnObj.count);
+        } else {
+            resultArr.push(returnObj)
+        }
+        ;
     }
     return resultArr.reverse();
 }
@@ -69,22 +74,22 @@ var LogAction = {
             if (isError(res, err)) {
                 return;
             }
-            resObj.data = formatArray(items, timePeriod, startDate, endDate) || [];
+            resObj.data = formatArray(items, timePeriod, startDate, endDate,false) || [];
             if (history) {
-                var oneDay = 24*60*60*1000,
+                var oneDay = 24 * 60 * 60 * 1000,
                     historyEnd = params['endDate'] = params['endDate'] - oneDay,
                     historyStart = params['startDate'] = params['startDate'] - oneDay;
                 logService.queryCount(params, function (err, hisitems) {
                     if (isError(res, err)) {
                         return;
                     }
-                    resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd) || [];
-                    logger.info('web query end'+ Date.now());
+                    resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd,false) || [];
+                    logger.info('web query end' + Date.now());
                     res.jsonp(resObj);
                 });
 
             } else {
-                logger.info('web query end'+ Date.now());
+                logger.info('web query end' + Date.now());
                 res.jsonp(resObj);
             }
         });
@@ -95,7 +100,8 @@ var LogAction = {
             startDate = params['startDate'] -= 0,
             timePeriod = (params['timePeriod'] || 1) * 60000,
             resObj = {ret: 0, msg: "success-query"},
-            history = params['history'] || 0;
+            history = params['history'] || 0,
+            isNotWithTime = params['withTime'] || false;
         params['id'] -= 0;
         params['level'] = params['level'] || ['4'];
         delete params.user;
@@ -104,8 +110,8 @@ var LogAction = {
                 return;
             }
             logger.debug(svgitems);
-            resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate) || [];
-            logger.info('web query end'+ Date.now());
+            resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate, isNotWithTime,isNotWithTime) || [];
+            logger.info('web query end' + Date.now());
             res.jsonp(resObj);
         })
     },
