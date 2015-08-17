@@ -281,20 +281,19 @@ function showCharts(opts) {
         success: function (data) {
             chart = chartInit(data);
             loading = false;
+            $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
+                data = {
+                    name:'五日均值线',
+                    data:data
+                };
+                chart&&chart.addSeries(data, false);
+                chart&&chart.redraw();
+            });
         },
         error: function () {
             loading = false;
         }
 
-    })
-
-    $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
-        data = {
-            name:'五日均值线',
-            data:data
-        };
-        chart.addSeries(data, false);
-        chart.redraw();
     });
 }
 
@@ -343,7 +342,7 @@ function chartInit(result) {
     resultArr = getArray(result);
     $('.main-table').hide();
     var box = $('.main-mid'), container = $('#chart-container');
-    if (!box.contains(container)) {
+    if (!$.contains(box[0],container[0])) {
         box.append('<div id="chart-container"></div>');
     }
     container.highcharts({

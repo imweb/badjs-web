@@ -1,15 +1,15 @@
-webpackJsonp([10],{
+webpackJsonp([6],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var log  =__webpack_require__(9);
+	var log  =__webpack_require__(12);
 
 	log.init();
 
 /***/ },
 
-/***/ 9:
+/***/ 12:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, _) {var Dialog = __webpack_require__(20);
@@ -295,20 +295,19 @@ webpackJsonp([10],{
 	        success: function (data) {
 	            chart = chartInit(data);
 	            loading = false;
+	            $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
+	                data = {
+	                    name:'五日均值线',
+	                    data:data
+	                };
+	                chart.addSeries(data, false);
+	                chart.redraw();
+	            });
 	        },
 	        error: function () {
 	            loading = false;
 	        }
 
-	    })
-
-	    $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
-	        data = {
-	            name:'五日均值线',
-	            data:data
-	        };
-	        chart.addSeries(data, false);
-	        chart.redraw();
 	    });
 	}
 
@@ -357,7 +356,7 @@ webpackJsonp([10],{
 	    resultArr = getArray(result);
 	    $('.main-table').hide();
 	    var box = $('.main-mid'), container = $('#chart-container');
-	    if (!box.contains(container)) {
+	    if (!$.contains(box[0],container[0])) {
 	        box.append('<div id="chart-container"></div>');
 	    }
 	    container.highcharts({

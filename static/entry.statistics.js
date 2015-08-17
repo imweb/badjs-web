@@ -1,4 +1,4 @@
-webpackJsonp([5],{
+webpackJsonp([8],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
@@ -20,7 +20,7 @@ webpackJsonp([5],{
 
 	__webpack_require__(19);
 	var Dialog = __webpack_require__(20);
-	var statisticsTpl = __webpack_require__(113);
+	var statisticsTpl = __webpack_require__(114);
 
 	var encodeHtml = function (str) {
 	    return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
@@ -2159,7 +2159,7 @@ webpackJsonp([5],{
 
 /***/ },
 
-/***/ 113:
+/***/ 114:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {module.exports = function (obj) {
