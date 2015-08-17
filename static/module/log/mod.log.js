@@ -89,8 +89,7 @@ function bindEvent() {
                 showLogs(logConfig, false);
             }
 
-        })
-        .on('click', 'showCharts', function () {
+        }).on('click', 'showCharts', function () {
             var startTime = $('#startTime').val(),
                 endTime = $('#endTime').val();
             //console.log('data', endTime);
@@ -101,8 +100,7 @@ function bindEvent() {
             if (isTimeRight(logConfig.startDate, logConfig.endDate, true)) {
                 showCharts(logConfig);
             }
-        })
-        .on('click', 'showSource', function (e, data) {
+        }).on('click', 'showSource', function (e, data) {
             // 内网服务器，拉取不到 外网数据,所以屏蔽掉请求
 
         }).on('change', 'selectBusiness', function () {
@@ -183,6 +181,7 @@ function isTimeRight(begin, end, isChart) {
                 header: '时间范围错误',
                 body: '图表时间范围请控制在一天之内！'
             });
+            return false;
         }
     }
     return true;
@@ -255,50 +254,8 @@ function showLogs(opts, isAdd) {
         }
     });
 }
-
-function showCharts(opts) {
-    if (opts.id <= 0 || loading) {
-        !loading && Dialog({
-            header: '警告',
-            body: '请选择一个项目'
-        });
-        return;
-    }
-
-    loading = true;
-
-    var url = "/errorMessageQueryCount",
-        svgUrl = '/errorMessageSvgCount',
-        chart;
-    $.ajax({
-        url: url,
-        data: {
-            id: opts.id,
-            startDate: opts.startDate,
-            endDate: opts.endDate,
-            history: 1
-        },
-        success: function (data) {
-            chart = chartInit(data);
-            loading = false;
-            $.get(svgUrl, {id: opts.id, startDate: opts.startDate, endDate: opts.endDate, withTime: false}, function (data) {
-                data = {
-                    name:'五日均值线',
-                    data:data
-                };
-                chart&&chart.addSeries(data, false);
-                chart&&chart.redraw();
-            });
-        },
-        error: function () {
-            loading = false;
-        }
-
-    });
-}
-
-function chartInit(result) {
-    var resultArr = [], timeArr = [],
+function ChartHelper() {
+    var resultArr = [], timeArr = [], chart,
         getTime = (function () {
             var dateString;
             return function (date, type) {
@@ -333,58 +290,110 @@ function chartInit(result) {
             var resultArr = [];
             resultArr.push(formatArr(result.data, true, false));
             resultArr.push(formatArr(result.history, false, false));
-            if (result.svg) {
-                resultArr.push(formatArr(result.svg, false, true));
-            }
             timeArr.reverse();
             return resultArr;
-        };
-    resultArr = getArray(result);
-    $('.main-table').hide();
-    var box = $('.main-mid'), container = $('#chart-container');
-    if (!$.contains(box[0],container[0])) {
-        box.append('<div id="chart-container"></div>');
-    }
-    container.highcharts({
-        chart: {
-            type: 'spline'
         },
-        title: {
-            text: '错误数据统计'
-        },
-        subtitle: {
-            text: '数据量'
-        },
-        xAxis: {
-            categories: timeArr
-        },
-        yAxis: {
-            title: {
-                text: '错误量'
+        init = function (result) {
+            resultArr = getArray(result);
+            $('.main-table').hide();
+            var box = $('.main-mid');
+            if (!$.contains(box[0], $('#chart-container')[0])) {
+                box.append('<div id="chart-container"></div>');
+                var container = $('#chart-container');
             }
-        },
-        tooltip: {
-            enabled: true,
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br>' + this.x + ': ' + this.y;
-            }
-        },
-        plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true
+            container.highcharts({
+                chart: {
+                    type: 'spline'
                 },
-                enableMouseTracking: true
-            }
+                title: {
+                    text: '错误数据统计'
+                },
+                subtitle: {
+                    text: '数据量'
+                },
+                xAxis: {
+                    categories: timeArr
+                },
+                yAxis: {
+                    title: {
+                        text: '错误量'
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br>' + this.x + ': ' + this.y;
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: true
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: resultArr
+            });
+            chart = container.highcharts();
         },
-        credits: {
-            enabled: false
-        },
-        series: resultArr
-    });
-    return container.highcharts();
+        addData = function (result) {
+            console.log(chart);
+            chart && chart.addSeries(result, false);
+            chart && chart.redraw();
+        };
+    return {
+        init: init,
+        addData: addData
+    }
 }
+function showCharts(opts) {
+    if (opts.id <= 0 || loading) {
+        !loading && Dialog({
+            header: '警告',
+            body: '请选择一个项目'
+        });
+        return;
+    }
 
+    loading = true;
+    console.log(Chart);
+    var url = "/errorMessageQueryCount",
+        svgUrl = '/errorMessageSvgCount',
+        chart = new ChartHelper();
+    $.ajax({
+        url: url,
+        data: {
+            id: opts.id,
+            startDate: opts.startDate,
+            endDate: opts.endDate,
+            history: 1
+        },
+        success: function (data) {
+            chart.init(data);
+            loading = false;
+            $.get(svgUrl, {
+                id: opts.id,
+                startDate: opts.startDate,
+                endDate: opts.endDate,
+                withTime: false
+            }, function (data) {
+                data = {
+                    name: '五日均值线',
+                    data: data.svg
+                };
+                chart.addData(data, true);
+            });
+        },
+        error: function () {
+            loading = false;
+        }
+
+    });
+}
 function init() {
     bindEvent();
     $(".datetimepicker").datetimepicker({format: 'YYYY-MM-DD HH:mm'}).data("DateTimePicker").setMaxDate(new Date());
