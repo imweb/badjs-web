@@ -17,7 +17,7 @@ var LogService = require('../../service/LogService'),
     };
 var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime) {
     var resultArr = [];
-    var timeCount = Math.ceil((endDate - startDate) / timePeriod) + 2;
+    var timeCount = Math.ceil((endDate - startDate) / timePeriod);
     for (; timeCount--;) {
         var tag = startDate + timeCount * timePeriod;
         var returnObj = {};
@@ -32,7 +32,7 @@ var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime
                 returnObj.count += parseInt(data.count);
 		logger.debug('the match count is '+returnObj.count);
             } else {
-                if(startDate < data.time && data.time < endDate){
+                if(startDate <= data.time && data.time < endDate){
 	            items.push(data);
                     break;
                 }
