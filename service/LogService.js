@@ -60,7 +60,10 @@ LogService.prototype = {
                 buffer += chunk.toString();
             }).on('end', function () {
                 try {
-                    callback(null, JSON.parse(buffer))
+                    if(global.debug){
+		         logger.debug(buffer);
+                    }
+		    callback(null, JSON.parse(buffer))
                 } catch (e) {
                     callback(e);
                 }

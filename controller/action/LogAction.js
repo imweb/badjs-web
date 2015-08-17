@@ -17,7 +17,7 @@ var LogService = require('../../service/LogService'),
     };
 var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime) {
     var resultArr = [];
-    var timeCount = Math.ceil((endDate - startDate) / timePeriod) + 1;
+    var timeCount = Math.ceil((endDate - startDate) / timePeriod) + 2;
     for (; timeCount--;) {
         var tag = startDate + timeCount * timePeriod;
         var returnObj = {};
@@ -25,14 +25,21 @@ var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime
         returnObj.count = 0;
         while (items.length) {
             var data = items.pop();
-            if (tag - data.time < timePeriod && tag - data.time >= 0) {
+            logger.debug('tag is '+tag);
+	    logger.debug('timePeriod is '+ timePeriod);
+	    logger.debug(tag-data.time);
+	    if (tag - data.time < timePeriod && tag - data.time >= 0) {
                 returnObj.count += parseInt(data.count);
+		logger.debug('the match count is '+returnObj.count);
             } else {
-                items.push(data);
-                break;
+                if(startDate < data.time && data.time < endDate){
+	            items.push(data);
+                    break;
+                }
             }
         }
         if (isNotWithTime) {
+	    logger.debug('the catch count is '+returnObj.count);
             resultArr.push(returnObj.count);
         } else {
             resultArr.push(returnObj)
@@ -110,7 +117,7 @@ var LogAction = {
                 return;
             }
             logger.debug(svgitems);
-            resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate, isNotWithTime,isNotWithTime) || [];
+            resObj.svg = formatArray(svgitems, timePeriod, startDate, endDate, isNotWithTime) || [];
             logger.info('web query end' + Date.now());
             res.jsonp(resObj);
         })

@@ -299,8 +299,8 @@ function ChartHelper() {
             var box = $('.main-mid');
             if (!$.contains(box[0], $('#chart-container')[0])) {
                 box.append('<div id="chart-container"></div>');
-                var container = $('#chart-container');
             }
+            var container = $('#chart-container');
             container.highcharts({
                 chart: {
                     type: 'spline'
