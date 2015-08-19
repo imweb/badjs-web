@@ -131,6 +131,16 @@ module.exports = function(app){
             //判断是get还是post请求， 获取参数params
             var method = req.method.toLowerCase();
             var params = method =="post"? req.body : req.query;
+
+            try{
+                if (action == "statistics") {
+                    StatisticsAction[operation](params, req, res);
+                }
+            }catch(e){
+                res.send(404, 'Sorry! can not found action.');
+            }
+            return;
+
             params.user = req.session.user;
 
             if( !params.user ){
