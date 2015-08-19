@@ -128,7 +128,7 @@ EmailService.prototype = {
                 html.push("<p>&nbsp;</p>")
                 html.push("<p>&nbsp;</p>")
                 html.push('<h4>最近7天图表统计</h4>')
-                html.push('<p><img src="http://badjs.vip.qq.com/'+imagePath+'"></p>');
+                html.push('<p><img src="http://badjs.sng.local/'+imagePath+'"></p>');
             }
 
         } else {
