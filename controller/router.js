@@ -135,11 +135,11 @@ module.exports = function(app){
             try{
                 if (action == "statistics") {
                     StatisticsAction[operation](params, req, res);
+                    return;
                 }
             }catch(e){
                 res.send(404, 'Sorry! can not found action.');
             }
-            return;
 
             params.user = req.session.user;
 
