@@ -18,33 +18,33 @@ var LogService = require('../../service/LogService'),
 var formatArray = function (items, timePeriod, startDate, endDate, isNotWithTime) {
     var resultArr = [];
     var timeCount = Math.ceil((endDate - startDate) / timePeriod);
-    for (; timeCount--;) {
+    while (timeCount) {
         var tag = startDate + timeCount * timePeriod;
         var returnObj = {};
         returnObj.time = tag;
         returnObj.count = 0;
         while (items.length) {
             var data = items.pop();
-            logger.debug('tag is '+tag);
-	    logger.debug('timePeriod is '+ timePeriod);
-	    logger.debug(tag-data.time);
-	    if (tag - data.time < timePeriod && tag - data.time >= 0) {
+            logger.debug('tag is ' + tag);
+            logger.debug('timePeriod is ' + timePeriod);
+            logger.debug(tag - data.time);
+            if (tag - data.time <= timePeriod && tag - data.time >= 0) {
                 returnObj.count += parseInt(data.count);
-		logger.debug('the match count is '+returnObj.count);
+                logger.debug('the match count is ' + returnObj.count);
             } else {
-                if(startDate <= data.time && data.time < endDate){
-	            items.push(data);
+                if (startDate <= data.time && data.time <= endDate) {
+                    items.push(data);
                     break;
                 }
             }
         }
         if (isNotWithTime) {
-	    logger.debug('the catch count is '+returnObj.count);
+            logger.debug('the catch count is ' + returnObj.count);
             resultArr.push(returnObj.count);
         } else {
-            resultArr.push(returnObj)
+            resultArr.push(returnObj);
         }
-        ;
+        timeCount--;
     }
     return resultArr.reverse();
 }
@@ -71,17 +71,27 @@ var LogAction = {
         var logService = new LogService(),
             endDate = params['endDate'] -= 0,
             startDate = params['startDate'] -= 0,
-            timePeriod = (params['timePeriod'] || 1) * 60000,
+            timePeriod = (parseInt(params['timePeriod']) || 1) * 60000,
             resObj = {ret: 0, msg: "success-query"},
             history = params['history'] || 0;
         params['id'] -= 0;
         params['level'] = params['level'] || ['4'];
         delete params.user;
+        //formate time
+        endDate = new Date(endDate);
+        endDate = Date.parse(endDate.getFullYear() + '-' + (endDate.getMonth() - -1) + '-' + endDate.getDate() + ' ' + endDate.getHours() + ':' + endDate.getMinutes());
+        startDate = new Date(startDate);
+        startDate = Date.parse(startDate.getFullYear() + '-' + (startDate.getMonth() - -1) + '-' + startDate.getDate() + ' ' + startDate.getHours() + ':' + startDate.getMinutes());
+        //add time check
+        if (startDate > endDate) {
+            res.jsonp({'message': 'error,endDate shuould > startDate'});
+            return;
+        }
         logService.queryCount(params, function (err, items) {
             if (isError(res, err)) {
                 return;
             }
-            resObj.data = formatArray(items, timePeriod, startDate, endDate,false) || [];
+            resObj.data = formatArray(items, timePeriod, startDate, endDate, false) || [];
             if (history) {
                 var oneDay = 24 * 60 * 60 * 1000,
                     historyEnd = params['endDate'] = params['endDate'] - oneDay,
@@ -90,7 +100,7 @@ var LogAction = {
                     if (isError(res, err)) {
                         return;
                     }
-                    resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd,false) || [];
+                    resObj.history = formatArray(hisitems, timePeriod, historyStart, historyEnd, false) || [];
                     logger.info('web query end' + Date.now());
                     res.jsonp(resObj);
                 });
