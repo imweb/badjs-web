@@ -40,7 +40,7 @@ var StatisticsAction = {
             res.json({ret:0 , msg:'success' , data : {} });
             return ;
         }
-        statisticsService.queryByChart({userName : param.user.loginName , projectId : param.projectId-0 , timeScope:param.timeScope-0 }  , function (err, data){
+        statisticsService.queryByChart({projectId : param.projectId-0 , timeScope:param.timeScope-0 }  , function (err, data){
             if(err){
                 res.json({ret:-1, msg:"error"});
                 return;
@@ -70,7 +70,7 @@ var StatisticsAction = {
             res.json({ret:0 , msg:'success' , data : {} });
             return ;
         }
-        statisticsService.queryById({userName : param.user.loginName , projectId : req.query.projectId-0 , startDate : new Date(param.startDate - 0 ) }  , function (err, data){
+        statisticsService.queryById({projectId : req.query.projectId-0 , startDate : new Date(param.startDate - 0 ) }  , function (err, data){
             if(err){
                 res.json({ret:-1 , msg:'error' , data : {} });
             }else {
