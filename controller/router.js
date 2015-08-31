@@ -133,6 +133,15 @@ module.exports = function(app){
             var params = method =="post"? req.body : req.query;
             params.user = req.session.user;
 
+            try{
+                if (action == "statistics") {
+                    StatisticsAction[operation](params, req, res);
+                    return;
+                }
+            }catch(e){
+                res.send(404, 'Sorry! can not found action.');
+            }
+
             if( !params.user ){
                 res.json({ret : -2 , msg : "should login"});
                 return ;

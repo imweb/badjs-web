@@ -1,11 +1,11 @@
 var  zmq = require('zmq')
     , client = zmq.socket('sub')
-    , port = "tcp://10.143.132.205:10000"
+    , port = "tcp://10.185.14.28:10000"
     , service = "badjs";
 
 var spawn  = require("child_process").spawn
 
-var badjsKey = "635658";
+var badjsKey = "666210";
 
 var path = "/usr/local/agenttools/agent/agentRepSum";
 
