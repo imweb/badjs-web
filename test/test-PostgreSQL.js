@@ -8,10 +8,10 @@ pg.connect(conString, function (err, client, done) {
     if (err) {
         return console.error('error fetching client from pool', err);
     }
-    var sql = "select * from( " +
+    var sql = "select data_cnt from( " +
         "select " +
         "ftime, " +
-	"- 999998 as develop_center,"+
+        "- 999998 as develop_center," +
         "page_name, " +
         "owner, " +
         "platform_name, " +
@@ -21,7 +21,7 @@ pg.connect(conString, function (err, client, done) {
         "sum(dt_client) as dt_client, " +
         "sum(dt_network) as dt_network, " +
         "sum(dt_page) as dt_page, " +
-	"sum(dt_net_page) as dt_net_page," +
+        "sum(dt_net_page) as dt_net_page," +
         "sum(dt_total) as dt_total, " +
         "sum(dt_webview) as dt_webview," +
         "sum(dt_url) as dt_url, " +
@@ -49,8 +49,8 @@ pg.connect(conString, function (err, client, done) {
         "dt_client," +
         "dt_network," +
         "dt_page," +
-	"dt_net_page," +
-	"dt_total," +
+        "dt_net_page," +
+        "dt_total," +
         "dt_webview," +
         "dt_url," +
         "dt_domready," +
@@ -80,7 +80,7 @@ pg.connect(conString, function (err, client, done) {
         "(loadurl_sum - clickstart_sum)/ data_cnt as dt_client, " +
         "(head_sum - loadurl_sum)/ data_cnt as dt_network, " +
         "(active_sum - head_sum)/ data_cnt as dt_page, " +
-	"(active_sum - loadurl_sum)/ data_cnt as dt_net_page,"+
+        "(active_sum - loadurl_sum)/ data_cnt as dt_net_page," +
         "(active_sum - clickstart_sum)/ data_cnt as dt_total, " +
         "(webviewstart_sum - clickstart_sum )/ data_cnt as dt_webview, " +
         "(loadurl_sum - webviewstart_sum)/ data_cnt as dt_url, " +
@@ -116,9 +116,9 @@ pg.connect(conString, function (err, client, done) {
     client.query(sql, function (err, result) {
         //call `done()` to release the client back to the pool
         done();
-	
+
         if (err) {
-	    console.log(sql);
+            console.log(sql);
             return console.error('error running query', err);
         }
         console.log(result);
