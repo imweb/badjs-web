@@ -1,24 +1,23 @@
 var pg = require('pg'),
     log4js = require('log4js'),
     logger = log4js.getLogger(),
-    fs = require('fs'),
-    path = require('path');
+    fs = require('fs');
 
-var connString = "postgres://tdw_v_zscai:234516038@pub-bi-tdw.oa.com:5432/sng_vas_speedtest_database";
-filePath = path.resolve('../fileStorage/pageid.json');
+var connString = GLOBAL.pjconfig.postgreSql.connString,
+    filePath = GLOBAL.pjconfig.fileStorage.pageid;
 
+//cache
 var postgreSql,
-    Done;
+    Done,
+    Result;
 
-/*
- pg.connect(connString, function (err, client, done) {
- if (err) {
- logger.warn('client err,the err is ' + err);
- }
- postgreSql = client;
- Done = done;
- });
- */
+pg.connect(connString, function (err, client, done) {
+    if (err) {
+        logger.warn('client err,the err is ' + err);
+    }
+    postgreSql = client;
+    Done = done;
+});
 
 /**
  * 通过postgresql来查询上报总数（pv）
@@ -137,14 +136,14 @@ function queryPvList(startTime, endTime, callback) {
         Done();
         if (err) {
             logger.warn('query has some err,err is :' + err);
+            typeof callback == 'function' && callback(err);
         }
-        typeof callback == 'function' && callback(JSON.stringify(result));
+        typeof callback == 'function' && callback(null, JSON.stringify(result));
     });
 }
 
 /**
  * 将appid转换成pageid
- * 同步
  * @param appid
  */
 
@@ -188,7 +187,7 @@ function writePageid(appid, pageid, callback) {
             if (err) {
                 logger.warn('write file is wrong the err is' + err);
             }
-            typeof callback == 'function' && callback();
+            typeof callback == 'function' && callback(err);
         });
     });
 }
@@ -203,7 +202,10 @@ function writePageid(appid, pageid, callback) {
 function queryPv(startTime, endTime, appid, callback) {
     var Pv,
         pageid = turn2pageId(appid);
-    queryPvList(startTime, endTime, function (result) {
+    queryPvList(startTime, endTime, function (err, result) {
+        if (err) {
+            typeof callback == 'function' && callback(err);
+        }
         var data = result.rows.length != 0 ? result.rows : [];
         if (data.length) {
             data.map(function (ele, index) {
@@ -214,14 +216,36 @@ function queryPv(startTime, endTime, appid, callback) {
         } else {
             logger.warn('the length of pv result is wrong get 0');
         }
-        typeof callback == 'function' && callback(Pv);
+        typeof callback == 'function' && callback(null, Pv);
     })
 }
 
+function httpQuery(param, callback) {
+    var startTime = Date.parse(param.startDate),
+        endTime = Date.parse(param.endDate),
+        appid = parseInt(param.appid);
+    if (startTime && endTime && appid) {
+        queryPvList(startTime, endTime, appid, function (err, result) {
+            if (err) {
+                callback && callback(err);
+            }
+            callback && callback(null, result)
+        })
+    } else {
+        callback && callback({err: 'params error'});
+    }
+}
 
-writePageid('110', '120', function () {
-    writePageid('120', '110', function () {
-        console.log(turn2pageId(110));
-        console.log(turn2pageId(120));
-    });
-});
+module.exports = function () {
+    return {
+        insert: function (appid, pageid) {
+            writePageid(appid, pageid);
+        },
+        query: function (startTime, endTime, appid, callback) {
+            queryPv(startTime, endTime, appid, callback);
+        },
+        httpQuery: function (param, callback) {
+            httpQuery(param, callback);
+        }
+    }
+}

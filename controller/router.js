@@ -11,7 +11,8 @@ var LogAction = require('./action/LogAction'),
     StatisticsAction = require("./action/StatisticsAction"),
     ApproveAction = require("./action/ApproveAction"),
     realtimeService = require("../service/RealtimeService"),
-    UserApplyAction = require("./action/UserApplyAction");
+    UserApplyAction = require("./action/UserApplyAction"),
+    compassService = require("./service/CompassService");
 
 
 var log4js = require('log4js'),
@@ -98,7 +99,7 @@ module.exports = function(app){
         res.redirect(homeUrl);
     });
 
-    //查询接口
+    //错误量的查询接口
     app.get('/errorMessageQuery',function(req,res){
          var method = req.method.toLowerCase();
 	 var params = method == "post"?req.body:req.query;
@@ -116,6 +117,29 @@ module.exports = function(app){
         var params = method == "post"?req.body:req.query;
         LogAction.querySvgCount(params,req,res);
     });
+    //pv测速的对外查询接口
+    app.get('/pvList',function(req,res){
+        logger.info('web query start '+Data.now());
+        var method = req.method.toLowerCase();
+        var params = method == 'post'?req.body:req.query;
+        compassService.httpQuery(params,function(err,result){
+            if(err){
+                res.jsonp(JSON.stringify(err));
+                return;
+            }
+            res.jsonp(JSON.stringify(result));
+        });
+    });
+    /**
+     * 管理员用户信息查询
+     * method get only*
+     */
+    app.get('/getUserList',function(req,res){
+        var params = req.query;
+        UserAction.queryListByCondition(params,req,res);
+    });
+
+
 
     // 请求路径为： controller/xxxAction/xxx.do (get || post)
     app.use("/",function(req, res , next){

@@ -5,7 +5,8 @@
 
 var BusinessService = require('../../service/BusinessService'),
     _ = require('underscore'),
-    StatisticsService = require('../../service/StatisticsService');
+    StatisticsService = require('../../service/StatisticsService'),
+    compassService = require('../../service/CompassService');
 
 var  log4js = require('log4js'),
     logger = log4js.getLogger();
@@ -41,10 +42,20 @@ var StatisticsAction = {
             return ;
         }
         statisticsService.queryByChart({projectId : param.projectId-0 , timeScope:param.timeScope-0 }  , function (err, data){
+            console.log(data);
             if(err){
                 res.json({ret:-1, msg:"error"});
                 return;
             }
+            data.data.forEach(function(ele,index){
+                if(Array.isArray(ele)){
+                    ele.forEach(function(ele,index){
+                        compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
+                            ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
+                        });
+                    })
+                }
+            });
             res.json(data);
         });
     },
@@ -56,6 +67,15 @@ var StatisticsAction = {
         }
 
         statisticsService.queryByChart({  projectId : param.projectId-0 , timeScope:param.timeScope-0}  , function (err, data){
+            data.data.forEach(function(ele,index){
+                if(Array.isArray(ele)){
+                    ele.forEach(function(ele,index){
+                        compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
+                            ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
+                        });
+                    })
+                }
+            });
             if(err){
                 res.json({ret:-1, msg:"error"});
                 return;

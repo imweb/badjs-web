@@ -63,7 +63,6 @@ app.use("/user" ,function (req , res , next){
         user  = req.session.user,
         //获取用户model
         userDao = req.models.userDao;
-
     req.indexUrl = req.protocol + "://" + req.get('host') + '/user/index.html';
 
     if(/^\/oalogin/i.test(req.url)){ // 登录
