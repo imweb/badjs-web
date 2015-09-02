@@ -42,7 +42,6 @@ var StatisticsAction = {
             return ;
         }
         statisticsService.queryByChart({projectId : param.projectId-0 , timeScope:param.timeScope-0 }  , function (err, data){
-            console.log(data);
             if(err){
                 res.json({ret:-1, msg:"error"});
                 return;
@@ -51,11 +50,13 @@ var StatisticsAction = {
                 if(Array.isArray(ele)){
                     ele.forEach(function(ele,index){
                         compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
-                            ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
+                        logger.info('compass query is success');    
+			ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
                         });
                     })
                 }
             });
+	    logger.info('query is start');
             res.json(data);
         });
     },

@@ -3,8 +3,8 @@ var pg = require('pg'),
     logger = log4js.getLogger(),
     fs = require('fs');
 
-var connString = GLOBAL.pjconfig.postgreSql.connString,
-    filePath = GLOBAL.pjconfig.fileStorage.pageid;
+var connString = 'postgres://tdw_v_zscai:234516038@pub-bi-tdw.oa.com:5432/sng_vas_speedtest_database',
+    filePath = '../fileStorage/appid.json';
 
 //cache
 var postgreSql,
@@ -36,7 +36,7 @@ function formateTime(stringTime) {
 function queryPvList(startTime, endTime, callback) {
     startTime = formateTime(startTime);
     endTime = formateTime(endTime);
-    var sql = "select data_cnt,pageid from( " +
+    var sql = "select data_cnt,pageid,page_name,owner from( " +
         "select " +
         "ftime, " +
         "- 999998 as develop_center," +
@@ -141,7 +141,7 @@ function queryPvList(startTime, endTime, callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
-
+	//console.log(postgreSql);
     postgreSql.query(sql, function (err, result) {
         Done();
         if (err) {
@@ -245,7 +245,7 @@ function httpQuery(param, callback) {
         callback && callback({err: 'params error'});
     }
 }
-
-queryPvList('2015-09-01','2015-09-02',function(result){
+setTimeout(function(){
+queryPvList('2015-09-01','2015-09-02',function(err,result){
     console.log(result);
-})
+})},1000);

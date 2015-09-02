@@ -148,7 +148,7 @@ function queryPvList(startTime, endTime, callback) {
             logger.warn('query has some err,err is :' + err);
             typeof callback == 'function' && callback(err);
         }
-        typeof callback == 'function' && callback(null, JSON.stringify(result));
+        typeof callback == 'function' && callback(null, result);
     });
 }
 
@@ -235,7 +235,7 @@ function httpQuery(param, callback) {
         endTime = Date.parse(param.endDate),
         appid = parseInt(param.appid);
     if (startTime && endTime && appid) {
-        queryPvList(startTime, endTime, appid, function (err, result) {
+        queryPvList(startTime, endTime, function (err, result) {
             if (err) {
                 callback && callback(err);
             }
