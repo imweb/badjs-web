@@ -119,7 +119,7 @@ module.exports = function(app){
     });
     //pv测速的对外查询接口
     app.get('/pvList',function(req,res){
-        logger.info('web query start '+Data.now());
+        logger.info('web query start '+Date.now());
         var method = req.method.toLowerCase();
         var params = method == 'post'?req.body:req.query;
         compassService.httpQuery(params,function(err,result){
