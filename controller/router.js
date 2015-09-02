@@ -12,7 +12,7 @@ var LogAction = require('./action/LogAction'),
     ApproveAction = require("./action/ApproveAction"),
     realtimeService = require("../service/RealtimeService"),
     UserApplyAction = require("./action/UserApplyAction"),
-    compassService = require("./service/CompassService");
+    compassService = require("../service/compassService");
 
 
 var log4js = require('log4js'),

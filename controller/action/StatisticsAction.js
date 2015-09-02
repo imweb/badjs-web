@@ -6,7 +6,7 @@
 var BusinessService = require('../../service/BusinessService'),
     _ = require('underscore'),
     StatisticsService = require('../../service/StatisticsService'),
-    compassService = require('../../service/CompassService');
+    compassService = require('../../service/compassService');
 
 var  log4js = require('log4js'),
     logger = log4js.getLogger();

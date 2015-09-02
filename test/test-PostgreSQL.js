@@ -10,15 +10,15 @@ filePath = path.resolve('../fileStorage/pageid.json');
 var postgreSql,
     Done;
 
-/*
+
  pg.connect(connString, function (err, client, done) {
- if (err) {
- logger.warn('client err,the err is ' + err);
- }
- postgreSql = client;
- Done = done;
+ 	if (err) {
+ 		logger.warn('client err,the err is ' + err);
+	 }
+	 postgreSql = client;
+	 Done = done;
  });
- */
+ 
 
 /**
  * 通过postgresql来查询上报总数（pv）
@@ -225,3 +225,7 @@ writePageid('110', '120', function () {
         console.log(turn2pageId(120));
     });
 });
+
+queryPvList('20150901','20150902',function(result){
+	console.log(result);
+})
