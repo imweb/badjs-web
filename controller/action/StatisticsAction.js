@@ -46,17 +46,18 @@ var StatisticsAction = {
                 res.json({ret:-1, msg:"error"});
                 return;
             }
-            data.data.forEach(function(ele,index){
-                if(Array.isArray(ele)){
-                    ele.forEach(function(ele,index){
+            var row = data.data;
+            for(var l = row.length;l--;){
+                if(Array.isArray(row[l])){
+                    for(var rowL = row[l];rowL--;){
+                        var ele = row[l][rowL];
                         compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
-                        logger.info('compass query is success');    
-			ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
+                            row[l][rowL] = ele.total+'('+(total/pv).toFixed(2)+')';
                         });
-                    })
+                    }
                 }
-            });
-	    logger.info('query is start');
+            }
+            data.data = row;
             res.json(data);
         });
     },
@@ -68,19 +69,24 @@ var StatisticsAction = {
         }
 
         statisticsService.queryByChart({  projectId : param.projectId-0 , timeScope:param.timeScope-0}  , function (err, data){
-            data.data.forEach(function(ele,index){
-                if(Array.isArray(ele)){
-                    ele.forEach(function(ele,index){
-                        compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
-                            ele.total = ele.total+'('+(total/pv).toFixed(2)+')';
-                        });
-                    })
-                }
-            });
             if(err){
                 res.json({ret:-1, msg:"error"});
                 return;
             }
+            /*var row = data.data;
+            for(var l = row.length;l--;){
+                if(Array.isArray(row[l])){
+                    for(var rowL = row[l];rowL--;){
+                        var ele = row[l][rowL];
+                        compassService.query(Date.parse(ele.startDate),Date.parse(ele.endDate),ele.protectid,function(pv){
+                        logger.debug('query is start');    
+			row[l][rowL] = ele.total+'('+(total/pv).toFixed(2)+')';
+                        });
+                    }
+                }*/
+            //}
+            //data.data = row;
+	    //logger.debug(data);
             res.json(data);
             return;
         });
