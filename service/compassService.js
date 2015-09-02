@@ -19,6 +19,14 @@ pg.connect(connString, function (err, client, done) {
     Done = done;
 });
 
+function formateTime(stringTime){
+    var DateObj = new Date(stringTime),
+        year = DateObj.getFullYear(),
+        month = DateObj.getMonth() - -1,
+        date = DateObj.getDate();
+    return year+(month.length == 2?month:0+''+month)+(date.length == 2?date:0+''+date);
+}
+
 /**
  * 通过postgresql来查询上报总数（pv）
  * @param startTime (long)
@@ -26,6 +34,8 @@ pg.connect(connString, function (err, client, done) {
  * @param callback (function)
  */
 function queryPvList(startTime, endTime, callback) {
+    startTime = formateTime(startTime);
+    endTime = formateTime(endTime);
     var sql = "select data_cnt,pageid from( " +
         "select " +
         "ftime, " +

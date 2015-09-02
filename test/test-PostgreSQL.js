@@ -10,7 +10,14 @@ filePath = path.resolve('../fileStorage/pageid.json');
 var postgreSql,
     Done;
 
-/*
+function formateTime(stringTime){
+    var DateObj = new Date(stringTime),
+        year = DateObj.getFullYear(),
+        month = DateObj.getMonth() - -1,
+        date = DateObj.getDate();
+    return year+(month.length == 2?month:0+''+month)+(date.length == 2?date:0+''+date);
+}
+
  pg.connect(connString, function (err, client, done) {
  if (err) {
  logger.warn('client err,the err is ' + err);
@@ -18,7 +25,6 @@ var postgreSql,
  postgreSql = client;
  Done = done;
  });
- */
 
 /**
  * 通过postgresql来查询上报总数（pv）
@@ -112,7 +118,7 @@ function queryPvList(startTime, endTime, callback) {
         " and buzid > 0 and siteid > 0 and pageid > 0 )" +
         " t1 LEFT JOIN public.r_haozhengwu_sng_page_info t2 ON t1.pagename = t2.page_key ) ElmData" +
         " where " +
-        "ftime in(" + startTime + ", " + endTime + ") " +
+        "ftime in(" + formateTime(startTime) + ", " + formateTime(endTime) + ") " +
         "and platform_name =- 1000000 " +
         "and network = '全网络' and version_name = '-1000000' " +
         "and iswebcache = '-1000000' " +
@@ -219,9 +225,3 @@ function queryPv(startTime, endTime, appid, callback) {
 }
 
 
-writePageid('110', '120', function () {
-    writePageid('120', '110', function () {
-        console.log(turn2pageId(110));
-        console.log(turn2pageId(120));
-    });
-});
