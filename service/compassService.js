@@ -141,7 +141,7 @@ function queryPvList(startTime, endTime, callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
-
+	console.log(postgreSql);
     postgreSql.query(sql, function (err, result) {
         Done();
         if (err) {
