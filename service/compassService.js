@@ -19,12 +19,12 @@ pg.connect(connString, function (err, client, done) {
     Done = done;
 });
 
-function formateTime(stringTime){
+function formateTime(stringTime) {
     var DateObj = new Date(stringTime),
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
         date = DateObj.getDate();
-    return year+(month.length == 2?month:0+''+month)+(date.length == 2?date:0+''+date);
+    return year + (month.length == 2 ? month : 0 + '' + month) + (date.length == 2 ? date : 0 + '' + date);
 }
 
 /**
@@ -246,16 +246,14 @@ function httpQuery(param, callback) {
     }
 }
 
-module.exports = function () {
-    return {
-        insert: function (appid, pageid) {
-            writePageid(appid, pageid);
-        },
-        query: function (startTime, endTime, appid, callback) {
-            queryPv(startTime, endTime, appid, callback);
-        },
-        httpQuery: function (param, callback) {
-            httpQuery(param, callback);
-        }
+module.exports = {
+    insert: function (appid, pageid) {
+        writePageid(appid, pageid);
+    },
+    query: function (startTime, endTime, appid, callback) {
+        queryPv(startTime, endTime, appid, callback);
+    },
+    httpQuery: function (param, callback) {
+        httpQuery(param, callback);
     }
 }

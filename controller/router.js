@@ -122,6 +122,8 @@ module.exports = function(app){
         logger.info('web query start '+Date.now());
         var method = req.method.toLowerCase();
         var params = method == 'post'?req.body:req.query;
+        console.log(compassService);
+        console.log(compassService.httpQuery);
         compassService.httpQuery(params,function(err,result){
             if(err){
                 res.jsonp(JSON.stringify(err));
