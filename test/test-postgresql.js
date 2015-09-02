@@ -19,12 +19,23 @@ pg.connect(connString, function (err, client, done) {
     Done = done;
 });
 
-function formateTime(stringTime) {
-    var DateObj = new Date(stringTime),
+function formateTime(time) {
+    var DateObj = new Date(time),
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
         date = DateObj.getDate();
     return year + (month.length == 2 ? month : 0 + '' + month) + (date.length == 2 ? date : 0 + '' + date);
+}
+
+function getformateTime(){
+    var dayObj = new Date(),
+        dayTime = 1000*60*60*24,
+        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-'+(dayObj.getDate()-1)),
+        timeString = '';
+    for(var i =7;i--;){
+        timeString += ''+formateTime(today - i*dayTime)+';';
+    }
+    return timeString;
 }
 
 /**
@@ -33,9 +44,8 @@ function formateTime(stringTime) {
  * @param endTime (long)
  * @param callback (function)
  */
-function queryPvList(startTime, endTime, callback) {
-    startTime = formateTime(startTime);
-    endTime = formateTime(endTime);
+function queryPvList(callback) {
+    var timeString = getformateTime();
     var sql = "select data_cnt,pageid from( " +
         "select " +
         "ftime, " +
@@ -121,7 +131,7 @@ function queryPvList(startTime, endTime, callback) {
         " and buzid > 0 and siteid > 0 and pageid > 0 )" +
         " t1 LEFT JOIN public.r_haozhengwu_sng_page_info t2 ON t1.pagename = t2.page_key ) ElmData" +
         " where " +
-        "ftime in(" + startTime + ", " + endTime + ") " +
+        "ftime in(" + timeString + ") " +
         "and platform_name =- 1000000 " +
         "and network = '全网络' and version_name = '-1000000' " +
         "and iswebcache = '-1000000' " +
@@ -148,10 +158,9 @@ function queryPvList(startTime, endTime, callback) {
             logger.warn('query has some err,err is :' + err);
             typeof callback == 'function' && callback(err);
         }
-        typeof callback == 'function' && callback(null, JSON.stringify(result));
+        typeof callback == 'function' && callback(null, result);
     });
 }
-
 /**
  * 将appid转换成pageid
  * @param appid
@@ -246,6 +255,6 @@ function httpQuery(param, callback) {
     }
 }
 
-queryPvList('2015-09-01','2015-09-02',function(result){
+queryPvList(function(result){
     console.log(result);
 })
