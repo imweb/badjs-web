@@ -265,10 +265,10 @@ function ChartHelper() {
                         dateString = date.getHours() + ":" + date.getMinutes();
                         break;
                     case 'date' :
-                        dateString = date.getMonth() + '-' + date.getDate();
+                        dateString = (date.getMonth() - -1) + '-' + date.getDate();
                         break;
                     case 'datetime' :
-                        dateString = date.getHours() + ":" + date.getMinutes() + ' ' + date.getMonth() + '-' + date.getDate();
+                        dateString = date.getHours() + ":" + date.getMinutes() + ' ' + (date.getMonth() - -1) + '-' + date.getDate();
                 }
                 return dateString;
             }

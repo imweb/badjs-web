@@ -1,10 +1,18 @@
+/**
+ * 用来获取罗盘的测速上报信息
+ * @author homkerliu
+ * @type {PG|exports|module.exports}
+ */
+
 var pg = require('pg'),
     log4js = require('log4js'),
     logger = log4js.getLogger(),
-    fs = require('fs');
+    fs = require('fs'),
+    configFileService = require('./ConfigFileService'),
+    path = require('path');
 
 var connString = GLOBAL.pjconfig.postgreSql.connString,
-    filePath = GLOBAL.pjconfig.fileStorage.pageid;
+    filePath = path.resolve(GLOBAL.pjconfig.fileStorage.pageid);
 
 //cache
 var postgreSql,
@@ -19,6 +27,12 @@ pg.connect(connString, function (err, client, done) {
     Done = done;
 });
 
+/**
+ * 格式化时间为需要的对象格式
+ * @param time
+ * @returns {string} yyyyMMdd
+ */
+
 function formateTime(time) {
     var DateObj = new Date(time),
         year = DateObj.getFullYear(),
@@ -27,12 +41,17 @@ function formateTime(time) {
     return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
 }
 
-function getformateTime(){
+/**
+ * 得到格式化的时间字符串，默认长度为最近7天
+ * @param day
+ * @returns {string}
+ */
+function getformateTime(day) {
     var dayObj = new Date(),
-        dayTime = 1000*60*60*24,
-        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-'+(dayObj.getDate()-1)),
+        dayTime = 1000 * 60 * 60 * 24,
+        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-' + (dayObj.getDate() - 1)),
         timeString = '';
-    for(var i =7;i--;){
+    for(var i =day;i--;){
         timeString += ''+formateTime(today - i*dayTime);
 	if(i != 0){
 		timeString += ',';
@@ -43,13 +62,12 @@ function getformateTime(){
 
 /**
  * 通过postgresql来查询上报总数（pv）
- * @param startTime (long)
- * @param endTime (long)
+ * @param day
  * @param callback (function)
  */
-function queryPvList(callback) {
-    var timeString = getformateTime();
-    var sql = "select * from( " +
+function queryPvList(day, callback) {
+    var timeString = getformateTime(day);
+    var sql = "select data_cnt,concat(buzid,'-',siteid,'-',pageid)as pageid from( " +
         "select " +
         "ftime, " +
         "- 999998 as develop_center," +
@@ -73,6 +91,8 @@ function queryPvList(callback) {
         "ispreloadwebprocess, " +
         "is_key_page, " +
         "sum(pageid) as pageid, " +
+        "sum(buzid) as buzid," +
+        "sum(siteid) as siteid," +
         "- 600034 as product_id " +
         "from ( " +
         "SELECT " +
@@ -154,7 +174,6 @@ function queryPvList(callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
-	console.log(sql);
     postgreSql.query(sql, function (err, result) {
         Done();
         if (err) {
@@ -167,85 +186,87 @@ function queryPvList(callback) {
 
 /**
  * 将appid转换成pageid
- * @param appid
+ * 这个函数用的是同步
+ * @param key {siteid-pageid-buzid}
  */
 
-function turn2pageIdFrom(appid) {
-    try {
-        var data = JSON.parse(fs.readFileSync(filePath));
-    } catch (err) {
-        if (err) {
-            logger.warn('file read err ,the err is' + err);
-            return;
-        }
-    }
-    return data[appid];
-    //fs.readFile(filePath,function(err,data){
-    //    if(err){
-    //        logger.warn('file read err ,the err is'+ err);
-    //        return;
-    //    }
-    //    var data = JSON.parse(data);
-    //    return data[appid];
-    //});
+function turn2ApplyIdFrom(key) {
+    logger.debug(filePath);
+    var data = configFileService.querySync(filePath);
+    logger.debug(data);
+    return data[key];
 }
 
 /**
  * 将pageid和appid成对的以json的格式存入到指定的文件中去。
- * @param appid
- * @param pageid
+ * @param key {siteid-pageid-buzid}
+ * @param applyid
+ * @param callback
  */
-function writePageid(appid, pageid, callback) {
+function writePageid(key, applyid, callback) {
     var Data = {};
-    fs.readFile(filePath, function (err, data) {
+    Data[key] = applyid;
+    configFileService.insert(filePath, Data, function (err) {
         if (err) {
-            logger.warn('file read is wrong ,the err is ' + err);
+            logger.warn('write file is wrong the err is' + err);
             return;
         }
-        if (data) {
-            Data = JSON.parse(data);
-        }
-        Data[appid] = pageid;
-        fs.writeFile(filePath, JSON.stringify(Data), function (err) {
-            if (err) {
-                logger.warn('write file is wrong the err is' + err);
-            }
-            typeof callback == 'function' && callback(err);
-        });
-    });
+        callback && callback(err);
+    }, 'json');
+    /*    fs.readFile(filePath, function (err, data) {
+     if (err) {
+     logger.warn('file read is wrong ,the err is ' + err);
+     return;
+     }
+     if (data) {
+     Data = JSON.parse(data);
+     }
+     Data[appid] = pageid;
+     fs.writeFile(filePath, JSON.stringify(Data), function (err) {
+     if (err) {
+     logger.warn('write file is wrong the err is' + err);
+     }
+     typeof callback == 'function' && callback(err);
+     });
+     });*/
 }
 
 /**
  * 查询pv
- * @param startTime
- * @param endTime
- * @param appid
  * @param callback
  */
 function queryPv(callback) {
-
-    queryPvList(function (err, result) {
+    queryPvList(7, function (err, result) {
         if (err) {
+	    logger.error('query sql is err ,the error is'+err);
             typeof callback == 'function' && callback(err);
         }
-        var data = result.rows.length != 0 ? result.rows : [];
-        typeof callback == 'function' && callback(null, data);
+        var data = result.rows.length != 0 ? result.rows : [],
+            result = [];
+        data.forEach(function (ele, index) {
+            ele.applyid = turn2ApplyIdFrom(ele.pageid);
+            result.push(ele);
+        });
+	logger.debug(result);
+        typeof callback == 'function' && callback(null, result);
     })
 }
-
+/**
+ * 提供对外查询接口
+ * @param param
+ * @param callback
+ */
 function httpQuery(param, callback) {
-    var startTime = Date.parse(param.startDate),
-        endTime = Date.parse(param.endDate),
+    var day = parseInt(param.day) || 7,
         appid = parseInt(param.appid);
-    if (startTime && endTime && appid) {
-        queryPvList(function (err, result) {
-            if (err) {
-                callback && callback(err);
-            }
-            callback && callback(null, result)
-        })
+    if (appid) {
+        queryPv(function (err, result) {
+            callback && callback(err, result);
+        });
     } else {
-        callback && callback({err: 'params error'});
+        queryPvList(day, function (err, result) {
+            callback && callback(err, result)
+        })
     }
 }
 
@@ -259,7 +280,10 @@ module.exports = {
     httpQuery: function (param, callback) {
         httpQuery(param, callback);
     },
-    turn2pageidfrom: function (appid) {
-        turn2pageIdFrom(appid)
+    turn2ApplyIdFrom: function (appid) {
+        turn2ApplyIdFrom(appid);
+    },
+    formateTime: function(timeString){
+        formateTime(timeString);
     }
 }

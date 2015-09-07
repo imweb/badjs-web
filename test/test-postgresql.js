@@ -27,16 +27,16 @@ function formateTime(time) {
     return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
 }
 
-function getformateTime(){
+function getformateTime() {
     var dayObj = new Date(),
-        dayTime = 1000*60*60*24,
-        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-'+(dayObj.getDate()-1)),
+        dayTime = 1000 * 60 * 60 * 24,
+        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-' + (dayObj.getDate() - 1)),
         timeString = '';
-    for(var i =7;i--;){
-        timeString += ''+formateTime(today - i*dayTime);
-    	if(i != 0){
-		timeString += ',';
-	}
+    for (var i = 7; i--;) {
+        timeString += '' + formateTime(today - i * dayTime);
+        if (i != 0) {
+            timeString += ',';
+        }
     }
     return timeString;
 }
@@ -49,7 +49,7 @@ function getformateTime(){
  */
 function queryPvList(callback) {
     var timeString = getformateTime();
-    var sql = "select ftime,data_cnt,pageid from( " +
+    var sql = "select owner,ftime,data_cnt,concat(buzid,'-',siteid,'-',pageid) as pageid from( " +
         "select " +
         "ftime, " +
         "- 999998 as develop_center," +
@@ -73,6 +73,8 @@ function queryPvList(callback) {
         "ispreloadwebprocess, " +
         "is_key_page, " +
         "sum(pageid) as pageid, " +
+	"sum(siteid) as siteid,"+
+	"sum(buzid) as buzid,"+
         "- 600034 as product_id " +
         "from ( " +
         "SELECT " +
