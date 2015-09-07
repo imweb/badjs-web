@@ -77,7 +77,8 @@ var StatisticsAction = {
                         for(var rowL = row[l]; rowL--;){
                             var ele = row[l][rowL];
 			    result.forEach(function(item){
-                                if(ele.protectid == item.applyid&&formateTime(ele.startDate) == item.ftime){
+				logger.debug('first id:'+ele.projectId);
+                                if(ele.projectId == item.applyid&&formateTime(ele.startDate) == item.ftime){
                                     row[l][rowL] = ele.total + '(' + (ele.total/item.data_cnt).toFixed(2) + ')';
                                 }		
                             });
@@ -113,7 +114,11 @@ var StatisticsAction = {
                         for (var rowL = row[l]; rowL--;) {
                             var ele = row[l][rowL];
                             result.forEach(function (item) {
-                                if (ele.protectid == item.applyid && formateTime(ele.startDate) == item.ftime) {
+				logger.debug(ele.projectId);
+				logger.debug(item.applyid);
+				logger.debug(formateTime(ele.startDate));
+				logger.debug(item.ftime);
+                                if (ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime) {
                                     row[l][rowL] = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
                                 }
                             });
