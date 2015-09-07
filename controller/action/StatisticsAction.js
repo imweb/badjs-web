@@ -75,9 +75,11 @@ var StatisticsAction = {
                         }
                     }
                 }
+		data.data = row;
+		res.json(data);
             });
-            data.data = row;
-            res.json(data);
+            //data.data = row;
+            //res.json(data);
         });
     },
     queryByChartForAdmin: function (param, req, res) {
@@ -109,10 +111,11 @@ var StatisticsAction = {
                         }
                     }
                 }
+		data.data = row;
+		res.json(data);
             });
-            data.data = row;
-            res.json(data);
-            return;
+            //data.data = row;
+            //res.json(data);
         });
     },
     queryById: function (param, req, res) {

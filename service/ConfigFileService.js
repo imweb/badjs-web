@@ -66,14 +66,16 @@ function queryFromFile(filePath, callback) {
  */
 
 function queryFromFileBySync(filepath) {
+    var data = {};
     try {
-        var data = JSON.parse(fs.readFileSync(filepath));
+        data = JSON.parse(fs.readFileSync(filepath));
     } catch (error) {
         if (error) {
             logger.warn('read file sync error ,err is' + error);
             return;
         }
     }
+    logger.debug(data);
     return data;
 }
 

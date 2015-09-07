@@ -67,7 +67,7 @@ function getformateTime(day) {
  */
 function queryPvList(day, callback) {
     var timeString = getformateTime(day);
-    var sql = "select data_cnt,concat(buzid,'-',siteid,'-',pageid)as pageid from( " +
+    var sql = "select ftime,data_cnt,concat(buzid,'-',siteid,'-',pageid)as pageid from( " +
         "select " +
         "ftime, " +
         "- 999998 as develop_center," +
@@ -192,9 +192,19 @@ function queryPvList(day, callback) {
 
 function turn2ApplyIdFrom(key) {
     logger.debug(filePath);
-    var data = configFileService.querySync(filePath);
+    var data = querySync(filePath);
     logger.debug(data);
     return data[key];
+}
+
+function querySync(filePath){
+    try{
+        return JSON.parse(fs.readFileSync(filePath));
+    }catch(err){
+	if(err){
+		logger.error('read file err,err is'+err);
+	}
+    }
 }
 
 /**
