@@ -74,7 +74,11 @@ var StatisticsAction = {
                 return;
             }
             /*var row = data.data;
+            compassService.query()
+
+            var row = data.data;
             for(var l = row.length;l--;){
+
                 if(Array.isArray(row[l])){
                     for(var rowL = row[l];rowL--;){
                         var ele = row[l][rowL];

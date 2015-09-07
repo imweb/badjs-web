@@ -19,12 +19,26 @@ pg.connect(connString, function (err, client, done) {
     Done = done;
 });
 
-function formateTime(stringTime) {
-    var DateObj = new Date(stringTime),
+function formateTime(time) {
+    var DateObj = new Date(time),
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
-        date = DateObj.getDate();
-    return year + (month.length == 2 ? month : 0 + '' + month) + (date.length == 2 ? date : 0 + '' + date);
+        date = DateObj.getDate() - 0;
+    return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
+}
+
+function getformateTime(){
+    var dayObj = new Date(),
+        dayTime = 1000*60*60*24,
+        today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-'+(dayObj.getDate()-1)),
+        timeString = '';
+    for(var i =7;i--;){
+        timeString += ''+formateTime(today - i*dayTime);
+	if(i != 0){
+		timeString += ',';
+	}
+    }
+    return timeString;
 }
 
 /**
@@ -33,10 +47,9 @@ function formateTime(stringTime) {
  * @param endTime (long)
  * @param callback (function)
  */
-function queryPvList(startTime, endTime, callback) {
-    startTime = formateTime(startTime);
-    endTime = formateTime(endTime);
-    var sql = "select data_cnt,pageid from( " +
+function queryPvList(callback) {
+    var timeString = getformateTime();
+    var sql = "select * from( " +
         "select " +
         "ftime, " +
         "- 999998 as develop_center," +
@@ -121,7 +134,7 @@ function queryPvList(startTime, endTime, callback) {
         " and buzid > 0 and siteid > 0 and pageid > 0 )" +
         " t1 LEFT JOIN public.r_haozhengwu_sng_page_info t2 ON t1.pagename = t2.page_key ) ElmData" +
         " where " +
-        "ftime in(" + startTime + ", " + endTime + ") " +
+        "ftime in(" + timeString + ") " +
         "and platform_name =- 1000000 " +
         "and network = 'È«ÍøÂç' and version_name = '-1000000' " +
         "and iswebcache = '-1000000' " +
@@ -141,7 +154,7 @@ function queryPvList(startTime, endTime, callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
-	console.log(postgreSql);
+	console.log(sql);
     postgreSql.query(sql, function (err, result) {
         Done();
         if (err) {
@@ -157,7 +170,7 @@ function queryPvList(startTime, endTime, callback) {
  * @param appid
  */
 
-function turn2pageId(appid) {
+function turn2pageIdFrom(appid) {
     try {
         var data = JSON.parse(fs.readFileSync(filePath));
     } catch (err) {
@@ -209,24 +222,14 @@ function writePageid(appid, pageid, callback) {
  * @param appid
  * @param callback
  */
-function queryPv(startTime, endTime, appid, callback) {
-    var Pv,
-        pageid = turn2pageId(appid);
-    queryPvList(startTime, endTime, function (err, result) {
+function queryPv(callback) {
+
+    queryPvList(function (err, result) {
         if (err) {
             typeof callback == 'function' && callback(err);
         }
         var data = result.rows.length != 0 ? result.rows : [];
-        if (data.length) {
-            data.map(function (ele, index) {
-                if (ele.pageid = pageid) {
-                    Pv = ele.data_cnt;
-                }
-            })
-        } else {
-            logger.warn('the length of pv result is wrong get 0');
-        }
-        typeof callback == 'function' && callback(null, Pv);
+        typeof callback == 'function' && callback(null, data);
     })
 }
 
@@ -235,7 +238,7 @@ function httpQuery(param, callback) {
         endTime = Date.parse(param.endDate),
         appid = parseInt(param.appid);
     if (startTime && endTime && appid) {
-        queryPvList(startTime, endTime, function (err, result) {
+        queryPvList(function (err, result) {
             if (err) {
                 callback && callback(err);
             }
@@ -250,10 +253,13 @@ module.exports = {
     insert: function (appid, pageid) {
         writePageid(appid, pageid);
     },
-    query: function (startTime, endTime, appid, callback) {
-        queryPv(startTime, endTime, appid, callback);
+    query: function (callback) {
+        queryPv(callback);
     },
     httpQuery: function (param, callback) {
         httpQuery(param, callback);
+    },
+    turn2pageidfrom: function (appid) {
+        turn2pageIdFrom(appid)
     }
 }
