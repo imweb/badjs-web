@@ -72,6 +72,7 @@ var StatisticsAction = {
             }
             var row = data.data;
             compassService.query(function(err,result){
+		logger.info('the callback is done in querybychart');
                 for(var l = row.length; l--;){
                     if(Array.isArray(row[l])){
                         for(var rowL = row[l]; rowL--;){
@@ -85,6 +86,7 @@ var StatisticsAction = {
                         }
                     }
                 }
+		logger.info('run to here');
 		data.data = row;
 		res.json(data);
             });
@@ -108,8 +110,10 @@ var StatisticsAction = {
                 return;
             }
             var row = data.data;
+	    logger.debug(row);
             compassService.query(function (err, result) {
-                for (var l = row.length; l--;) {
+                logger.info('callback is done');
+		for (var l = row.length; l--;) {
                     if (Array.isArray(row[l])) {
                         for (var rowL = row[l]; rowL--;) {
                             var ele = row[l][rowL];
@@ -125,6 +129,7 @@ var StatisticsAction = {
                         }
                     }
                 }
+		logger.info('run to here');
 		data.data = row;
 		res.json(data);
             });
