@@ -11,6 +11,15 @@ var BusinessService = require('../../service/BusinessService'),
 var log4js = require('log4js'),
     logger = log4js.getLogger();
 
+
+function formateTime(time) {
+    var DateObj = new Date(time),
+        year = DateObj.getFullYear(),
+        month = DateObj.getMonth() - -1,
+        date = DateObj.getDate() - 0;
+    return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
+}
+
 var StatisticsAction = {
 
 
@@ -68,7 +77,7 @@ var StatisticsAction = {
                         for(var rowL = row[l]; rowL--;){
                             var ele = row[l][rowL];
 			    result.forEach(function(item){
-                                if(ele.protectid == item.applyid&&compassService.formateTime(ele.startDate) == item.ftime){
+                                if(ele.protectid == item.applyid&&formateTime(ele.startDate) == item.ftime){
                                     row[l][rowL] = ele.total + '(' + (ele.total/item.data_cnt).toFixed(2) + ')';
                                 }		
                             });
@@ -104,7 +113,7 @@ var StatisticsAction = {
                         for (var rowL = row[l]; rowL--;) {
                             var ele = row[l][rowL];
                             result.forEach(function (item) {
-                                if (ele.protectid == item.applyid && compassService.formateTime(ele.startDate) == item.ftime) {
+                                if (ele.protectid == item.applyid && formateTime(ele.startDate) == item.ftime) {
                                     row[l][rowL] = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
                                 }
                             });
