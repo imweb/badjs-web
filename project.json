@@ -28,6 +28,7 @@
     "connString": "postgres://tdw_v_zscai:234516038@pub-bi-tdw.oa.com:5432/sng_vas_speedtest_database"
   },
   "fileStorage":{
-    "pageid":"./fileStorage/pageid.json"
+    "pageid":"./fileStorage/pageid.json",
+    "threshold":"./fileStorage/threshold.json"
   }
 }

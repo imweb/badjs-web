@@ -76,7 +76,7 @@ var StatisticsAction = {
                     var ele = row[l];
                     result.forEach(function(item){
                         if(ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime){
-                            row[l].total = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
+                            row[l].total = ele.total + '( ' + ((ele.total / item.data_cnt)*100).toFixed(2) + '% )';
                         }
                     });
                 }
@@ -109,7 +109,7 @@ var StatisticsAction = {
                     var ele = row[l];
                     result.forEach(function(item){
                        if(ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime){
-                           row[l].total = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
+                           row[l].total = ele.total + '( ' + ((ele.total / item.data_cnt)*100).toFixed(2) + '% )';
                        }
                     });
                 }
