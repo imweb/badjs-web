@@ -86,7 +86,7 @@ var userAction = {
 //    },
     queryListByCondition: function (params, req, res) {
         var userService = new UserService();
-        var isAdmin = req.session ? (req.session.user.role == 1) : 0;
+        var isAdmin = req.session.user ? (req.session.user.role == 1) : 1;
         //用户根据项目查询项目成员
         if (params.applyId && params.role) {
             params.applyId -= 0;
@@ -96,7 +96,7 @@ var userAction = {
             return;
         }
 
-        if (params.user.role != 1) {
+        if (params.user&&params.user.role != 1) {
             params.userId = params.user.id;
         }
 
