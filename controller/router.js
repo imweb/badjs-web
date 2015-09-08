@@ -144,8 +144,12 @@ module.exports = function (app) {
     app.get('/getThreshold', function (req, res) {
         var params = req.query,
             filePath = path.resolve(GLOBAL.pjconfig.fileStorage.threshold);
-        ConfigFileService.query(filePath, function (data) {
-            res.json(data);
+        ConfigFileService.query(filePath, function (err, data) {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(data);
+            }
         });
     });
 

@@ -29,7 +29,7 @@ function insertFile(filePath, data, callback) {
  */
 function insertJson(filePath, data, callback) {
     queryFromFile(filePath, function (err, result) {
-        extend(data, result,true);
+        extend(data, result, true);
         insertFile(filePath, data, callback);
     })
 }
@@ -88,9 +88,9 @@ module.exports = {
         }
     },
     query: function (filePath, callback) {
-            queryFromFile(filePath, callback);
+        queryFromFile(filePath, callback);
     },
-    querySync:function(filePath){
-            queryFromFileBySync(filePath);
+    querySync: function (filePath) {
+        queryFromFileBySync(filePath);
     }
 };
