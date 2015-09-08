@@ -17,7 +17,8 @@ var LogAction = require('./action/LogAction'),
 
 
 var log4js = require('log4js'),
-    logger = log4js.getLogger();
+    logger = log4js.getLogger(),
+    path = require('path');
 
 module.exports = function (app) {
 
@@ -142,7 +143,7 @@ module.exports = function (app) {
     });
     app.get('/getThreshold', function (req, res) {
         var params = req.query,
-            filePath = GLOBAL.pjconfig.fileStorage.threshold;
+            filePath = path.resolve(GLOBAL.pjconfig.fileStorage.threshold);
         ConfigFileService.query(filePath, function (data) {
             res.json(data);
         });

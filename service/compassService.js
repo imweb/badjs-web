@@ -15,17 +15,16 @@ var connString = GLOBAL.pjconfig.postgreSql.connString,
     filePath = path.resolve(GLOBAL.pjconfig.fileStorage.pageid);
 
 //cache
-var postgreSql,
-    Done,
+var postgreSql = new pg.Client(connString),
     Result;
 
-pg.connect(connString, function (err, client, done) {
-    if (err) {
-        logger.warn('client err,the err is ' + err);
-    }
-    postgreSql = client;
-    Done = done;
-});
+/*pg.connect(connString, function (err, client, done) {
+ if (err) {
+ logger.warn('client err,the err is ' + err);
+ }
+ postgreSql = postgreSql||client;
+ Done = done;
+ });*/
 
 /**
  * 格式化时间为需要的对象格式
@@ -51,11 +50,11 @@ function getformateTime(day) {
         dayTime = 1000 * 60 * 60 * 24,
         today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-' + (dayObj.getDate() - 1)),
         timeString = '';
-    for(var i =day;i--;){
-        timeString += ''+formateTime(today - i*dayTime);
-	if(i != 0){
-		timeString += ',';
-	}
+    for (var i = day; i--;) {
+        timeString += '' + formateTime(today - i * dayTime);
+        if (i != 0) {
+            timeString += ',';
+        }
     }
     return timeString;
 }
@@ -174,13 +173,19 @@ function queryPvList(day, callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
-    postgreSql.query(sql, function (err, result) {
-        Done();
+    postgreSql.connect(function (err) {
         if (err) {
-            logger.warn('query has some err,err is :' + err);
-            typeof callback == 'function' && callback(err);
+            logger.error('postgresql has connect err ,the err is' + err);
         }
-        typeof callback == 'function' && callback(null, result);
+        postgreSql.query(sql, function (err, result) {
+            if (err) {
+                logger.warn('query has some err,err is :' + err);
+                typeof callback == 'function' && callback(err);
+            }
+            Result = Result||result;
+            typeof callback == 'function' && callback(null, Result);
+            postgreSql.end();
+        });
     });
 }
 
@@ -197,13 +202,13 @@ function turn2ApplyIdFrom(key) {
     return data[key];
 }
 
-function querySync(filePath){
-    try{
+function querySync(filePath) {
+    try {
         return JSON.parse(fs.readFileSync(filePath));
-    }catch(err){
-	if(err){
-		logger.error('read file err,err is'+err);
-	}
+    } catch (err) {
+        if (err) {
+            logger.error('read file err,err is' + err);
+        }
     }
 }
 
@@ -248,7 +253,7 @@ function writePageid(key, applyid, callback) {
 function queryPv(callback) {
     queryPvList(7, function (err, result) {
         if (err) {
-	    logger.error('query sql is err ,the error is'+err);
+            logger.error('query sql is err ,the error is' + err);
             typeof callback == 'function' && callback(err);
         }
         var data = result.rows.length != 0 ? result.rows : [],
@@ -257,7 +262,7 @@ function queryPv(callback) {
             ele.applyid = turn2ApplyIdFrom(ele.pageid);
             result.push(ele);
         });
-	logger.debug(result);
+        logger.debug(result);
         typeof callback == 'function' && callback(null, result);
     })
 }
@@ -293,7 +298,7 @@ module.exports = {
     turn2ApplyIdFrom: function (appid) {
         turn2ApplyIdFrom(appid);
     },
-    formateTime: function(timeString){
+    formateTime: function (timeString) {
         formateTime(timeString);
     }
 }
