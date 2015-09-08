@@ -173,18 +173,24 @@ function queryPvList(day, callback) {
         "is_key_page order by ftime desc nulls last," +
         "dt_total desc nulls last ) " +
         "as tmpElmData ";
+    if(Result){
+    	callback&&callback(null, Result);
+	return;
+    };
     postgreSql.connect(function (err) {
         if (err) {
             logger.error('postgresql has connect err ,the err is' + err);
+            return;
         }
         postgreSql.query(sql, function (err, result) {
             if (err) {
                 logger.warn('query has some err,err is :' + err);
                 typeof callback == 'function' && callback(err);
             }
+	    postgreSql.end();
             Result = Result||result;
             typeof callback == 'function' && callback(null, Result);
-            postgreSql.end();
+            //postgreSql.end();
         });
     });
 }
