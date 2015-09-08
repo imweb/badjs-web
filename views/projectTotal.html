@@ -6,8 +6,10 @@
     <div class="wrap">
         <!--<%=include('./common/leftSide.html')(it, opt)%>-->
         <div class="mid-side">
-            <table id="chart-table" class="table table-condensed table-striped table-hover "></table>
-            <div id="chartsContainer"  class="main-mid">
+            <div class="table-responsive">
+                <table id="chart-table" class="table table-condensed table-striped table-hover "></table>
+            </div>
+            <div id="chartsContainer" class="main-mid">
 
             </div>
 
@@ -16,9 +18,9 @@
 
             <section>
                 <label class="setting-title">统计项目：</label>
-                <select class="form-control "  id="select-chartBusiness">
+                <select class="form-control " id="select-chartBusiness">
                     <option value="-1">-- 全部项目 --</option>
-                    <%  for(var i = 0 ; i < it.items.length ;i ++){
+                    <% for(var i = 0 ; i < it.items.length ;i ++){
                     var itemOne = it.items[i];
 
                     %>
@@ -28,7 +30,7 @@
             </section>
             <section>
                 <label class="setting-title">时间范围：</label>
-                <select disabled  class="form-control" id="select-timeScope">
+                <select disabled class="form-control" id="select-timeScope">
                     <option value="1">最近七天</option>
                     <option value="2">最近一个月</option>
                 </select>
