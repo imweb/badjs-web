@@ -48,14 +48,14 @@ var statistics = {
     },
     bindEvent: function () {
         var self = this;
+
+
         $('#showCharts').bind("click", function (e) {
             var param = {
                 projectId: $("#select-chartBusiness").val(),
                 timeScope: $("#select-timeScope").val()
             };
             $.getJSON("/controller/statisticsAction/queryByChartForAdmin.do", param, function (data) {
-                //var $options = $("#select-chartBusiness option");
-                //var $selectedOption = $("#select-chartBusiness").find("option:selected");
                 //chart_projects = [];
                 dayNumber = param.timeScope == 1 ? 7 : 30;
                 console.log(dayNumber);
@@ -95,6 +95,9 @@ var statistics = {
                 self.renderTable(data);
             });
         });
+
+        $('#showCharts').click();
+
     }
 
 };
@@ -139,6 +142,16 @@ function sortChartData(data) {
     ;
 }
 
+function getNameList() {
+    var $options = $("#select-chartBusiness option"),
+        projectLength = $options.length,
+        project = {};
+    for (var i = 1; i < projectLength; i++) {
+        project[$options.eq(i).val() - 0] = $options.eq(i).text();
+    }
+    return project;
+}
+
 
 function formateTime(time) {
     var DateObj = new Date(time),
@@ -153,7 +166,7 @@ function getformateTime(day) {
         dayTime = 1000 * 60 * 60 * 24,
         today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-' + (dayObj.getDate() - 1)),
         groups = [];
-
+    groups.push({caption: '', span: 1});
     for (var i = day; i--;) {
         var item = {};
         item.caption = formateTime(today - i * dayTime);
@@ -164,15 +177,16 @@ function getformateTime(day) {
 }
 
 function sortData(data) {
-    var result = [], resultObj = {};
+    var result = [], resultObj = {}, nameListObj = getNameList();
     data.forEach(function (item) {
         if (!resultObj.hasOwnProperty(item.projectId)) {
             resultObj[item.projectId] = {};
             resultObj[item.projectId]['recid'] = item.projectId;
         }
         resultObj[item.projectId][formateTime(item.startDate) + '-total'] = item.total;
-        resultObj[item.projectId][formateTime(item.startDate) + '-pv'] = item.total;
-        resultObj[item.projectId][formateTime(item.startDate) + '-rate'] = item.total;
+        resultObj[item.projectId][formateTime(item.startDate) + '-pv'] = item.pv;
+        resultObj[item.projectId][formateTime(item.startDate) + '-rate'] = item.rate;
+        resultObj[item.projectId]['name'] = nameListObj[item.projectId];
 
     });
     for (var key in resultObj) {
@@ -184,10 +198,18 @@ function sortData(data) {
 
 function getColumns(groups) {
     var columns = [];
+    columns.push({
+        field: 'name',
+        caption: '项目名称',
+        size: '9%',
+        sortable: false,
+        attr: 'align=center',
+        resizable: false
+    });
     groups.forEach(function (item) {
-        var columnTotal = {caption: 'total', size: '14%', sortable: true, attr: 'align=center', resizable: true},
-            columnPv = {caption: 'pv', size: '14%', sortable: true, attr: 'align=center', resizable: true},
-            columnRate = {caption: 'total/pv', size: '14%', sortable: true, attr: 'align=center', resizable: true};
+        var columnTotal = {caption: 'total', size: '13%', sortable: true, attr: 'align=center', resizable: true},
+            columnPv = {caption: 'pv', size: '13%', sortable: true, attr: 'align=center', resizable: true},
+            columnRate = {caption: 'total/pv', size: '13%', sortable: true, attr: 'align=center', resizable: true};
         console.log(item);
         columnTotal['field'] = item.caption + '-total';
         columnPv['field'] = item.caption + '-pv';
@@ -211,7 +233,10 @@ function renderTable(data) {
         show: {footer: true},
         columnGroups: data.groups,
         columns: data.columns,
-        records: data.data
+        records: data.data,
+        sort: [
+            { "field": getformateTime(1)[1]['caption']+'-pv', "direction": "DASC" },
+        ]
     });
 }
 
