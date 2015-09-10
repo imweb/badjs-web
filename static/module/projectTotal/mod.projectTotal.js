@@ -166,13 +166,14 @@ function getformateTime(day) {
         dayTime = 1000 * 60 * 60 * 24,
         today = Date.parse(dayObj.getFullYear() + '-' + (dayObj.getMonth() - -1) + '-' + (dayObj.getDate() - 1)),
         groups = [];
-    groups.push({caption: '', span: 1});
+    groups.push({caption: ' ', span: 1});
     for (var i = day; i--;) {
         var item = {};
         item.caption = formateTime(today - i * dayTime);
         item.span = 3;
         groups.push(item);
     }
+    console.log(groups,'groups');
     return groups;
 }
 
@@ -206,8 +207,8 @@ function getColumns(groups) {
         attr: 'align=center',
         resizable: true
     });
-    groups.shift();
-    groups.forEach(function (item) {
+
+    groups.slice(1).forEach(function (item) {
         var columnTotal = {caption: 'total', size: '13%', sortable: true, attr: 'align=center', resizable: true},
             columnPv = {caption: 'pv', size: '13%', sortable: true, attr: 'align=center', resizable: true},
             columnRate = {caption: 'total/pv', size: '13%', sortable: true, attr: 'align=center', resizable: true};

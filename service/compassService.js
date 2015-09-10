@@ -218,6 +218,7 @@ function querySync(filePath) {
         if (err) {
             logger.error('read file err,err is' + err);
         }
+        return {};
     }
 }
 
