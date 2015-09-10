@@ -34,8 +34,10 @@
     "zmq": "^2.11.0"
   },
   "devDependencies": {
-    "webpack": "~1.8.5",
-    "glob": "~5.0.5"
+    "css-loader": "^0.17.0",
+    "glob": "~5.0.5",
+    "style-loader": "^0.12.3",
+    "webpack": "~1.8.5"
   },
   "scripts": {},
   "author": "",

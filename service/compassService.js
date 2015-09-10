@@ -175,6 +175,9 @@ function queryPvList(day, callback) {
         "as tmpElmData ";
     if (Result) {
         callback && callback(null, Result);
+        setTimeout(function(){
+            Result = false;
+        },6*60*60*1000);
         return;
     };
     postgreSql.connect(function (err) {
