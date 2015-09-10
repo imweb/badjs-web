@@ -7,8 +7,8 @@
 require("jquery/jquery.datetimepicker");
 require("charts/highcharts");
 require("charts/sand-signika");
-//require('w2ui/w2ui-1.4.3.min.js');
-//require('w2ui/w2ui-1.4.3.min.css');
+require('w2ui/w2ui-1.4.3.min.js');
+require('w2ui/w2ui-1.4.3.min.css');
 var Dialog = require("dialog/dialog");
 var statisticsTpl = require("./template/statistics.ejs");
 
