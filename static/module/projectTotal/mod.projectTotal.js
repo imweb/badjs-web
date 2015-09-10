@@ -24,26 +24,26 @@ var statistics = {
 
     },
     setChart: function (data) {
-      /*  $('#chartsContainer').highcharts({                   //图表展示容器，与div的id保持一致
-            chart: {
-                type: 'line'                         //指定图表的类型，默认是折线图（line）
-            },
-            title: {
-                text: ""  //指定图表标题
-            },
-            xAxis: {
-                categories: setChartX(dayNumber)
-            },
-            yAxis: {
-                title: {
-                    text: '报错数量'                  //指定y轴的标题
-                }
-            },
-            series: chart_projects
-        });*/
+        /*  $('#chartsContainer').highcharts({                   //图表展示容器，与div的id保持一致
+         chart: {
+         type: 'line'                         //指定图表的类型，默认是折线图（line）
+         },
+         title: {
+         text: ""  //指定图表标题
+         },
+         xAxis: {
+         categories: setChartX(dayNumber)
+         },
+         yAxis: {
+         title: {
+         text: '报错数量'                  //指定y轴的标题
+         }
+         },
+         series: chart_projects
+         });*/
     },
     renderTable: function (data) {
-       renderTable(data);
+        renderTable(data);
         //$('#chart-table').html(statisticsTpl({item: chart_projects}));
     },
     bindEvent: function () {
@@ -61,32 +61,32 @@ var statistics = {
                 console.log(dayNumber);
                 data.groups = getformateTime(dayNumber);
                 data.columns = getColumns(data.groups);
-               /* if (param.projectId == -1) {
-                    var projectLength = $options.length;
-                    for (var i = 1; i < projectLength; i++) {
-                        var defaultData1 = [];
-                        setDefaultTotal(defaultData1, dayNumber);
-                        var project = {
-                            name: $options.eq(i).text(),
-                            projectId: $options.eq(i).val() - 0,
-                            date: days,
-                            data: defaultData1
-                        };
-                        chart_projects.push(project);
-                    }
-                } else {
-                    var defaultData2 = [];
-                    setDefaultTotal(defaultData2, dayNumber);
-                    var project = {
-                        name: $selectedOption.text(),
-                        projectId: $("#select-chartBusiness").val() - 0,
-                        date: days,
-                        data: defaultData2
-                    };
-                    chart_projects.push(project)
-                };
+                /* if (param.projectId == -1) {
+                 var projectLength = $options.length;
+                 for (var i = 1; i < projectLength; i++) {
+                 var defaultData1 = [];
+                 setDefaultTotal(defaultData1, dayNumber);
+                 var project = {
+                 name: $options.eq(i).text(),
+                 projectId: $options.eq(i).val() - 0,
+                 date: days,
+                 data: defaultData1
+                 };
+                 chart_projects.push(project);
+                 }
+                 } else {
+                 var defaultData2 = [];
+                 setDefaultTotal(defaultData2, dayNumber);
+                 var project = {
+                 name: $selectedOption.text(),
+                 projectId: $("#select-chartBusiness").val() - 0,
+                 date: days,
+                 data: defaultData2
+                 };
+                 chart_projects.push(project)
+                 };
 
-                //设置表格title*/
+                 //设置表格title*/
                 chart_title = $("#select-chartBusiness").find("option:selected").text() + $("#select-timeScope").find("option:selected").text() + "统计";
                 data.data = sortData(data.data);
                 //sortChartData(data.data);
@@ -100,30 +100,30 @@ var statistics = {
 };
 /*
 
-function setChartX(number) {
-    var days = [];
-    var nowDay = new Date() - 0;
+ function setChartX(number) {
+ var days = [];
+ var nowDay = new Date() - 0;
 
-    for (var i = number; i > 0; i--) {
-        var day = nowDay - i * 1000 * 60 * 60 * 24;
-        days.push(_.formatDate(new Date(day), 'MM-DD'));
-    }
-    return days;
-};
-function setDefaultTotal(arr, number) {
-    for (var i = number; i > 0; i--) {
-        arr.push(0);
-    }
-};
-function whichDayIndex(day1) {
-    for (var i = 0, len = days.length; i < len; i++) {
-        if (day1 == days[i]) {
-            return i;
-        }
-    }
-    return false;
-}
-*/
+ for (var i = number; i > 0; i--) {
+ var day = nowDay - i * 1000 * 60 * 60 * 24;
+ days.push(_.formatDate(new Date(day), 'MM-DD'));
+ }
+ return days;
+ };
+ function setDefaultTotal(arr, number) {
+ for (var i = number; i > 0; i--) {
+ arr.push(0);
+ }
+ };
+ function whichDayIndex(day1) {
+ for (var i = 0, len = days.length; i < len; i++) {
+ if (day1 == days[i]) {
+ return i;
+ }
+ }
+ return false;
+ }
+ */
 //
 
 function sortChartData(data) {
@@ -189,9 +189,9 @@ function getColumns(groups) {
             columnPv = {caption: 'pv', size: '14%', sortable: true, attr: 'align=center', resizable: true},
             columnRate = {caption: 'total/pv', size: '14%', sortable: true, attr: 'align=center', resizable: true};
         console.log(item);
-        columnTotal['caption'] = columnTotal['field'] = item.caption + '-total';
-        columnPv['caption'] = columnPv['field'] = item.caption + '-pv';
-        columnRate['caption'] = columnRate['field'] = item.caption + '-rate';
+        columnTotal['field'] = item.caption + '-total';
+        columnPv['field'] = item.caption + '-pv';
+        columnRate['field'] = item.caption + '-rate';
         columns.push(columnTotal);
         columns.push(columnPv);
         columns.push(columnRate);
