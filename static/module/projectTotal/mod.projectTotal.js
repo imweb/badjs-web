@@ -201,11 +201,12 @@ function getColumns(groups) {
     columns.push({
         field: 'name',
         caption: '项目名称',
-        size: '9%',
+        size: '100px',
         sortable: false,
         attr: 'align=center',
-        resizable: false
+        resizable: true
     });
+    groups.shift();
     groups.forEach(function (item) {
         var columnTotal = {caption: 'total', size: '13%', sortable: true, attr: 'align=center', resizable: true},
             columnPv = {caption: 'pv', size: '13%', sortable: true, attr: 'align=center', resizable: true},

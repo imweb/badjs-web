@@ -71,12 +71,13 @@ var StatisticsAction = {
                 return;
             }
             var row = data.data;
-            compassService.query(function(err,result){
-                for(var l = row.length;l--;){
+            compassService.query(function (err, result) {
+                for (var l = row.length; l--;) {
                     var ele = row[l];
-                    result.forEach(function(item){
-                        if(ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime){
-                            row[l].total = ele.total + '( ' + ((ele.total / item.data_cnt)*100).toFixed(2) + '% )';
+                    result.forEach(function (item) {
+                        if (ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime) {
+                            row[l]['pv'] = item.data_cnt;
+                            row[l]['rate'] = ((ele.total / item.data_cnt) * 100).toFixed(2) + '%';
                         }
                     });
                 }
@@ -104,40 +105,41 @@ var StatisticsAction = {
             }
             var row = data.data;
             logger.debug(row);
-            compassService.query(function(err,result){
-                for(var l = row.length;l--;){
+            compassService.query(function (err, result) {
+                for (var l = row.length; l--;) {
                     var ele = row[l];
-                    result.forEach(function(item){
-                       if(ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime){
-                           row[l].total = ele.total + '( ' + ((ele.total / item.data_cnt)*100).toFixed(2) + '% )';
-                       }
+                    result.forEach(function (item) {
+                        if (ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime) {
+                            row[l]['pv'] = item.data_cnt;
+                            row[l]['rate'] = ((ele.total / item.data_cnt) * 100).toFixed(2) + '%';
+                        }
                     });
                 }
                 data.data = row;
                 res.json(data);
             });
             /*compassService.query(function (err, result) {
-                logger.info('callback is done');
-                for (var l = row.length; l--;) {
-                    if (Array.isArray(row[l])) {
-                        for (var rowL = row[l]; rowL--;) {
-                            var ele = row[l][rowL];
-                            result.forEach(function (item) {
-                                logger.debug(ele.projectId);
-                                logger.debug(item.applyid);
-                                logger.debug(formateTime(ele.startDate));
-                                logger.debug(item.ftime);
-                                if (ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime) {
-                                    row[l][rowL] = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
-                                }
-                            });
-                        }
-                    }
-                }
-                logger.info('run to here');
-                data.data = row;
-                res.json(data);
-            });*/
+             logger.info('callback is done');
+             for (var l = row.length; l--;) {
+             if (Array.isArray(row[l])) {
+             for (var rowL = row[l]; rowL--;) {
+             var ele = row[l][rowL];
+             result.forEach(function (item) {
+             logger.debug(ele.projectId);
+             logger.debug(item.applyid);
+             logger.debug(formateTime(ele.startDate));
+             logger.debug(item.ftime);
+             if (ele.projectId == item.applyid && formateTime(ele.startDate) == item.ftime) {
+             row[l][rowL] = ele.total + '(' + (ele.total / item.data_cnt).toFixed(2) + ')';
+             }
+             });
+             }
+             }
+             }
+             logger.info('run to here');
+             data.data = row;
+             res.json(data);
+             });*/
             //data.data = row;
             //res.json(data);
         });
