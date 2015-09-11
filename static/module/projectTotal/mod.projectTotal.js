@@ -14,7 +14,7 @@ var dayNumber = 0,
 var chart_title, chart_projects = [];
 var statistics = {
     init: function () {
-
+        window.w2ui = {};
         this.bindEvent();
 
     },
@@ -52,7 +52,7 @@ var statistics = {
             };
             $.getJSON("/controller/statisticsAction/queryByChartForAdmin.do", param, function (data) {
                 //chart_projects = [];
-                dayNumber = param.timeScope == 1 ? 7 : 30;
+                dayNumber = param.timeScope == 1 ? 5 : 30;
                 console.log(dayNumber);
                 data.groups = getformateTime(dayNumber);
                 data.columns = getColumns(data.groups);
@@ -64,6 +64,7 @@ var statistics = {
                 console.log('project', chart_projects);
                 //  self.setChart();
                 self.renderTable(data);
+                console.log(w2ui);
             });
         });
 
@@ -225,7 +226,6 @@ function renderTable(data) {
         records: data.data,
 
     });
-    console.log(w2ui);
 }
 
 
