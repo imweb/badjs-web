@@ -4,13 +4,8 @@
  * */
 
 
-require("jquery/jquery.datetimepicker");
-require("charts/highcharts");
-require("charts/sand-signika");
 require('w2ui/w2ui-1.4.3.min.js');
 require('w2ui/w2ui-1.4.3.min.css');
-var Dialog = require("dialog/dialog");
-var statisticsTpl = require("./template/statistics.ejs");
 
 
 var dayNumber = 0,
@@ -61,34 +56,10 @@ var statistics = {
                 console.log(dayNumber);
                 data.groups = getformateTime(dayNumber);
                 data.columns = getColumns(data.groups);
-                /* if (param.projectId == -1) {
-                 var projectLength = $options.length;
-                 for (var i = 1; i < projectLength; i++) {
-                 var defaultData1 = [];
-                 setDefaultTotal(defaultData1, dayNumber);
-                 var project = {
-                 name: $options.eq(i).text(),
-                 projectId: $options.eq(i).val() - 0,
-                 date: days,
-                 data: defaultData1
-                 };
-                 chart_projects.push(project);
-                 }
-                 } else {
-                 var defaultData2 = [];
-                 setDefaultTotal(defaultData2, dayNumber);
-                 var project = {
-                 name: $selectedOption.text(),
-                 projectId: $("#select-chartBusiness").val() - 0,
-                 date: days,
-                 data: defaultData2
-                 };
-                 chart_projects.push(project)
-                 };
-
-                 //设置表格title*/
+                data.nameListObj = getNameList(param.projectId);
+                data.projectId = param.projectId;
                 chart_title = $("#select-chartBusiness").find("option:selected").text() + $("#select-timeScope").find("option:selected").text() + "统计";
-                data.data = sortData(data.data);
+                data.data = sortData(data.data,data.nameListObj);
                 //sortChartData(data.data);
                 console.log('project', chart_projects);
                 //  self.setChart();
@@ -142,14 +113,21 @@ function sortChartData(data) {
     ;
 }
 
-function getNameList() {
+function getNameList(projectId) {
+    console.log(projectId);
     var $options = $("#select-chartBusiness option"),
         projectLength = $options.length,
         project = {};
     for (var i = 1; i < projectLength; i++) {
         project[$options.eq(i).val() - 0] = $options.eq(i).text();
     }
-    return project;
+    if (projectId == -1) {
+        return project;
+    } else {
+        var resultObj = {};
+        resultObj[projectId] = project[projectId];
+        return resultObj;
+    }
 }
 
 
@@ -173,23 +151,27 @@ function getformateTime(day) {
         item.span = 3;
         groups.push(item);
     }
-    console.log(groups,'groups');
+    console.log(groups, 'groups');
     return groups;
 }
 
-function sortData(data) {
-    var result = [], resultObj = {}, nameListObj = getNameList();
+function sortData(data,nameList) {
+    var result = [], resultObj = {}, nameListObj = nameList;
     data.forEach(function (item) {
-        if (!resultObj.hasOwnProperty(item.projectId)) {
-            resultObj[item.projectId] = {};
-            resultObj[item.projectId]['recid'] = item.projectId;
-        }
-        resultObj[item.projectId][formateTime(item.startDate) + '-total'] = item.total;
-        resultObj[item.projectId][formateTime(item.startDate) + '-pv'] = item.pv;
-        resultObj[item.projectId][formateTime(item.startDate) + '-rate'] = item.rate;
-        resultObj[item.projectId]['name'] = nameListObj[item.projectId];
+            if (nameListObj.hasOwnProperty(item.projectId)) {
+                if (!resultObj.hasOwnProperty(item.projectId)) {
+                    resultObj[item.projectId] = {};
+                    resultObj[item.projectId]['recid'] = item.projectId;
+                }
+                resultObj[item.projectId][formateTime(item.startDate) + '-total'] = item.total;
+                resultObj[item.projectId][formateTime(item.startDate) + '-pv'] = item.pv;
+                resultObj[item.projectId][formateTime(item.startDate) + '-rate'] = item.rate;
+                resultObj[item.projectId]['name'] = nameListObj[item.projectId];
 
-    });
+            }
+        }
+    )
+    ;
     for (var key in resultObj) {
         result.push(resultObj[key]);
     }
@@ -225,21 +207,25 @@ function getColumns(groups) {
 }
 
 function renderTable(data) {
+    console.log(typeof w2ui.grid != 'undefined'&&(data.projectId != -1));
+    if(w2ui.grid&&data.projectId != -1){
+        w2ui.grid.clear();
+        w2ui.grid.records = data.data;
+        w2ui.grid.refresh();
+        return;
+    }
     $('#grid').w2grid({
         name: 'grid',
-        searches: [
-            {field: 'lname', caption: 'Last Name', type: 'text'},
-            {field: 'fname', caption: 'First Name', type: 'text'},
-            {field: 'email', caption: 'Email', type: 'text'},
-        ],
         show: {footer: true},
+        sortData: [
+            {field: getformateTime(1)[1]['caption'] + '-pv', direction: "DASC"}
+        ],
         columnGroups: data.groups,
         columns: data.columns,
         records: data.data,
-        sort: [
-            { "field": getformateTime(1)[1]['caption']+'-pv', "direction": "DASC" },
-        ]
+
     });
+    console.log(w2ui);
 }
 
 
