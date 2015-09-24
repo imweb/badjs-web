@@ -32,7 +32,7 @@ var StatisticsService = function (){
     this.statisticsDao = global.models.statisticsDao;
     this.applyDao = global.models.applyDao;
 
-    this.triggerUrl = GLOBAL.pjconfig.storage.errorMsgTopCacheUrl
+    this.triggerUrl = GLOBAL.pjconfig.storage.errorMsgTopCacheUrl;
     this.url = GLOBAL.pjconfig.storage.errorMsgTopUrl;
 
     logger.debug('query url : ' + this.url);

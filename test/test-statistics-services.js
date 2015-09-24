@@ -3,8 +3,11 @@ var mysql = require('mysql'),
     orm = require('orm');
 
 //GLOBAL.DEBUG = true;
-var mysql = "mysql://badjs:pass4badjs@10.134.5.103:3306/badjs";
+
+var mysql ="mysql://badjs:pass4badjs@10.198.30.62:4250/badjs";
+//var mysql = "mysql://badjs:pass4badjs@10.134.5.103:3306/badjs";
 //var mysql = "mysql://root:root@localhost:3306/badjs";
+
 
 orm.connect( mysql, function(err , db) {
     if(err){
@@ -38,7 +41,12 @@ orm.connect( mysql, function(err , db) {
         })
     }
 
-    fetch(991 , startDate);
+    var list = [47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,30,29,28,27,26,25,24,22,21,20,19,18,51];
+    var i, s;
+    for(i= 0,s=0; s<5 && list[i];i++,s++){
+        fetch(list[i] , startDate);
+    }
+
 
 });
 
