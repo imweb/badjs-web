@@ -1,5 +1,5 @@
 /**
- * ÓÃÀ´»ñÈ¡ÂŞÅÌµÄ²âËÙÉÏ±¨ĞÅÏ¢
+ * ç”¨æ¥è·å–ç½—ç›˜çš„æµ‹é€Ÿä¸ŠæŠ¥ä¿¡æ¯
  * @author homkerliu
  * @type {PG|exports|module.exports}
  */
@@ -27,7 +27,7 @@ var postgreSql = new pg.Client(connString),
  });*/
 
 /**
- * ¸ñÊ½»¯Ê±¼äÎªĞèÒªµÄ¶ÔÏó¸ñÊ½
+ * æ ¼å¼åŒ–æ—¶é—´ä¸ºéœ€è¦çš„å¯¹è±¡æ ¼å¼
  * @param time
  * @returns {string} yyyyMMdd
  */
@@ -37,11 +37,11 @@ function formateTime(time) {
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
         date = DateObj.getDate() - 0;
-    return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
+    return year + (month > 9 ? month + '' :  0 + '' + month) + (date > 9 ? date + '' : 0 + '' + date);
 }
 
 /**
- * µÃµ½¸ñÊ½»¯µÄÊ±¼ä×Ö·û´®£¬Ä¬ÈÏ³¤¶ÈÎª×î½ü7Ìì
+ * å¾—åˆ°æ ¼å¼åŒ–çš„æ—¶é—´å­—ç¬¦ä¸²ï¼Œé»˜è®¤é•¿åº¦ä¸ºæœ€è¿‘7å¤©
  * @param day
  * @returns {string}
  */
@@ -60,7 +60,7 @@ function getformateTime(day) {
 }
 
 /**
- * Í¨¹ıpostgresqlÀ´²éÑ¯ÉÏ±¨×ÜÊı£¨pv£©
+ * é€šè¿‡postgresqlæ¥æŸ¥è¯¢ä¸ŠæŠ¥æ€»æ•°ï¼ˆpvï¼‰
  * @param day
  * @param callback (function)
  */
@@ -127,7 +127,7 @@ function queryPvList(day, callback) {
         "pageid, " +
         "concat(buzid, '_', siteid, '_', pageid) as pagename," +
         "platform_name, " +
-        "case when net_type = '-1000000' then 'È«ÍøÂç' " +
+        "case when net_type = '-1000000' then 'å…¨ç½‘ç»œ' " +
         "when net_type = '2g' then '2g' " +
         "when net_type = '3g' then '3g' " +
         "when net_type = '4g' then '4g' " +
@@ -155,7 +155,7 @@ function queryPvList(day, callback) {
         " where " +
         "ftime in(" + timeString + ") " +
         "and platform_name =- 1000000 " +
-        "and network = 'È«ÍøÂç' and version_name = '-1000000' " +
+        "and network = 'å…¨ç½‘ç»œ' and version_name = '-1000000' " +
         "and iswebcache = '-1000000' " +
         "and is_offline = '-1000000' " +
         "and ispreloadwebprocess = '-1000000' " +
@@ -199,8 +199,8 @@ function queryPvList(day, callback) {
 }
 
 /**
- * ½«appid×ª»»³Épageid
- * Õâ¸öº¯ÊıÓÃµÄÊÇÍ¬²½
+ * å°†appidè½¬æ¢æˆpageid
+ * è¿™ä¸ªå‡½æ•°ç”¨çš„æ˜¯åŒæ­¥
  * @param key {siteid-pageid-buzid}
  */
 
@@ -223,7 +223,7 @@ function querySync(filePath) {
 }
 
 /**
- * ½«pageidºÍappid³É¶ÔµÄÒÔjsonµÄ¸ñÊ½´æÈëµ½Ö¸¶¨µÄÎÄ¼şÖĞÈ¥¡£
+ * å°†pageidå’Œappidæˆå¯¹çš„ä»¥jsonçš„æ ¼å¼å­˜å…¥åˆ°æŒ‡å®šçš„æ–‡ä»¶ä¸­å»ã€‚
  * @param key {siteid-pageid-buzid}
  * @param applyid
  * @param callback
@@ -257,7 +257,7 @@ function writePageid(key, applyid, callback) {
 }
 
 /**
- * ²éÑ¯pv
+ * æŸ¥è¯¢pv
  * @param callback
  */
 function queryPv(callback) {
@@ -277,7 +277,7 @@ function queryPv(callback) {
     })
 }
 /**
- * Ìá¹©¶ÔÍâ²éÑ¯½Ó¿Ú
+ * æä¾›å¯¹å¤–æŸ¥è¯¢æ¥å£
  * @param param
  * @param callback
  */

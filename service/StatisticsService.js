@@ -49,7 +49,7 @@ StatisticsService.prototype = {
             }
 
 
-
+    logger.info('[queryById]items:' + items.toString());
             if(items[0] ){
                 items[0].content = JSON.parse(items[0].content);
 
