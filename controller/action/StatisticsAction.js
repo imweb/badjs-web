@@ -17,7 +17,7 @@ function formateTime(time) {
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
         date = DateObj.getDate() - 0;
-    return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
+    return year + (month > 9 ? month + '': 0 + '' + month) + (date > 9 ? date + '' : 0 + '' + date);
 }
 
 var StatisticsAction = {
