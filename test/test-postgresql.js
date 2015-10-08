@@ -24,7 +24,7 @@ function formateTime(time) {
         year = DateObj.getFullYear(),
         month = DateObj.getMonth() - -1,
         date = DateObj.getDate() - 0;
-    return year + (month > 9 ? month : 0 + '' + month) + (date > 9 ? date : 0 + '' + date);
+    return year + (month > 9 ? month + '': 0 + '' + month) + (date > 9 ? date + '': 0 + '' + date);
 }
 
 function getformateTime() {
@@ -42,7 +42,7 @@ function getformateTime() {
 }
 
 /**
- * Í¨¹ıpostgresqlÀ´²éÑ¯ÉÏ±¨×ÜÊı£¨pv£©
+ * é€šè¿‡postgresqlæ¥æŸ¥è¯¢ä¸ŠæŠ¥æ€»æ•°ï¼ˆpvï¼‰
  * @param startTime (long)
  * @param endTime (long)
  * @param callback (function)
@@ -110,7 +110,7 @@ function queryPvList(callback) {
         "pageid, " +
         "concat(buzid, '_', siteid, '_', pageid) as pagename," +
         "platform_name, " +
-        "case when net_type = '-1000000' then 'È«ÍøÂç' " +
+        "case when net_type = '-1000000' then 'å…¨ç½‘ç»œ' " +
         "when net_type = '2g' then '2g' " +
         "when net_type = '3g' then '3g' " +
         "when net_type = '4g' then '4g' " +
@@ -138,7 +138,7 @@ function queryPvList(callback) {
         " where " +
         "ftime in(" + timeString + ") " +
         "and platform_name =- 1000000 " +
-        "and network = 'È«ÍøÂç' and version_name = '-1000000' " +
+        "and network = 'å…¨ç½‘ç»œ' and version_name = '-1000000' " +
         "and iswebcache = '-1000000' " +
         "and is_offline = '-1000000' " +
         "and ispreloadwebprocess = '-1000000' " +
@@ -167,7 +167,7 @@ function queryPvList(callback) {
     });
 }
 /**
- * ½«appid×ª»»³Épageid
+ * å°†appidè½¬æ¢æˆpageid
  * @param appid
  */
 
@@ -192,7 +192,7 @@ function turn2pageId(appid) {
 }
 
 /**
- * ½«pageidºÍappid³É¶ÔµÄÒÔjsonµÄ¸ñÊ½´æÈëµ½Ö¸¶¨µÄÎÄ¼şÖĞÈ¥¡£
+ * å°†pageidå’Œappidæˆå¯¹çš„ä»¥jsonçš„æ ¼å¼å­˜å…¥åˆ°æŒ‡å®šçš„æ–‡ä»¶ä¸­å»ã€‚
  * @param appid
  * @param pageid
  */
@@ -217,7 +217,7 @@ function writePageid(appid, pageid, callback) {
 }
 
 /**
- * ²éÑ¯pv
+ * æŸ¥è¯¢pv
  * @param startTime
  * @param endTime
  * @param appid
