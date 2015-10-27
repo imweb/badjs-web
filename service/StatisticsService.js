@@ -28,7 +28,6 @@ var dateFormat  = function (date , fmt){
 };
 
 var StatisticsService = function (){
-
     this.statisticsDao = global.models.statisticsDao;
     this.applyDao = global.models.applyDao;
 

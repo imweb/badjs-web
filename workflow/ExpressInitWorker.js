@@ -42,7 +42,6 @@ app.use(orm.express(msqlUrl, {
     models.userApplyDao = require('../dao/UserApplyDao')(db);
     models.statisticsDao = require('../dao/StatisticsDao')(db);
     models.db = db;
-
     global.models = models;
     logger.info('mysql connected');
     next();
