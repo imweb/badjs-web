@@ -2,7 +2,7 @@
 // SMS/RTX appended by Warpigzhu 7/27, 2012
 
 var http = require('http')
-  , _APPKEY = '5d9ea7472a5c4645a617e4eaab72cfa5'; // apply at http://tof.oa.com/, enable IPs of your machine
+  , _APPKEY = '9dfe187df3da4bda80a52866f435b265'; // apply at http://tof.oa.com/, enable IPs of your machine
 
 // --------------------------------------
 /*

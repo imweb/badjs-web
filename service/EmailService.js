@@ -135,6 +135,13 @@ EmailService.prototype = {
                 .replace(/{{per}}/g, (total_top * 100 / total).toFixed(2) + '%')
             );
 
+            if(imagePath){
+                html.push("<p>&nbsp;</p>")
+                html.push("<p>&nbsp;</p>")
+                html.push('<h4>最近7天图表统计</h4>')
+                html.push('<p><img src="http://badjs.sng.local/'+imagePath+'"></p>');
+            }
+
         } else {
             html.push('<p style="border-top:1px solid #666;margin-top:20px;width:520px;padding:5px 0 0 10px">暂无数据</p>');
         }

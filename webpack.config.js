@@ -1,5 +1,5 @@
 var webpack = require("webpack");
-var glob = require("glob")
+var glob = require("glob");
 
 var path = require("path");
 
@@ -15,6 +15,7 @@ var filePath = array[i];
 var entryName = filePath.match(/load\.(.+)\.js/i , filePath )[1];
     entryMap["entry." + entryName + ""] = filePath.replace("static" , ".");
 }
+
 
 entryMap["common"] =  [
     "underscore" ,
@@ -38,7 +39,7 @@ module.exports = {
     },
     module : {
         loaders: [
-            { test: /\.css/, loader: "css!style" },
+            { test: /\.css$/, loader: "style!css" },
             { test: /\.ejs/, loader: "ejs" },
         ]
     },
@@ -49,8 +50,10 @@ module.exports = {
             $: 'jquery',
             jQuery: 'jquery',
             'window.jQuery': 'jquery',
-            _: 'underscore'
-        })
+            _: 'underscore',
+            w2ui:'../../lib/w2ui/w2ui-1.4.3.min.js',
+            'window.w2ui':'../../lib/w2ui/w2ui-1.4.3.min.js'
+        }),
     ]
 
 };

@@ -1023,7 +1023,7 @@ form
     text-overflow: ellipsis;
 }
 
-/*charts Í¼±í*/
+/*charts Í¼ï¿½ï¿½*/
 
 #chart-table
 {
@@ -1155,4 +1155,11 @@ form
     border: 1px solid #ccc;
     border-radius: 2px;
     background: #eee;
+}
+.toolar-ul.show li {
+    left:0px;
+}
+
+.mt-30{
+    margin-top:30px;
 }

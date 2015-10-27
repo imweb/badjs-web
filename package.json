@@ -25,6 +25,7 @@
     "passport": "^0.2.1",
     "passport-local": "^1.0.0",
     "request": "^2.63.0",
+    "pg": "^4.4.1",
     "serve-static": "^1.7.1",
     "socket.io": "^1.2.0",
     "underscore": "1.5.2",
@@ -34,8 +35,10 @@
     "zmq": "^2.11.0"
   },
   "devDependencies": {
-    "webpack": "~1.8.5",
-    "glob": "~5.0.5"
+    "css-loader": "^0.17.0",
+    "glob": "~5.0.5",
+    "style-loader": "^0.12.3",
+    "webpack": "~1.8.5"
   },
   "scripts": {},
   "author": "",

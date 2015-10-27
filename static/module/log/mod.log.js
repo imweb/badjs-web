@@ -1,5 +1,6 @@
 /* global _ */
-var dialog = require("dialog/dialog");
+var Dialog = require("dialog/dialog");
+var Chart = require("charts/highcharts");
 var Delegator = require("delegator");
 
 var logTable = require("./template/logTable.ejs");
@@ -22,13 +23,17 @@ var logConfig = {
         return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
     };
 
-var maxDate = 60 * 60 * 1000 * 24 * 2;
+
+var maxDate = 60 * 60 * 1000 * 24 * 2,
+    onDate = 60 * 60 * 1000 * 24;
 
 var currentSelectId = -1,
     currentIndex = 0,
     noData = false,
     MAX_LIMIT = 500,
     loading = false;
+
+var currentSelectId = -1, currentIndex = 0, noData = false, MAX_LIMIT = 500, loading = false;
 
 function addKeyword() {
     var value = $.trim($('#keyword-ipt').val());
@@ -103,8 +108,19 @@ function bindEvent() {
             if (isTimeRight(logConfig.startDate, logConfig.endDate)) {
                 showLogs(logConfig, false);
             }
-        })
-        .on('click', 'showSource', function(e, data) {
+
+        }).on('click', 'showCharts', function () {
+            var startTime = $('#startTime').val(),
+                endTime = $('#endTime').val();
+            //console.log('data', endTime);
+            logConfig.startDate = startTime == '' ? new Date().getTime() - maxDate : new Date(startTime).getTime();
+            logConfig.endDate = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
+            //console.log('data', logConfig);
+            //测试时间是否符合
+            if (isTimeRight(logConfig.startDate, logConfig.endDate, true)) {
+                showCharts(logConfig);
+            }
+        }).on('click', 'showSource', function (e, data) {
             // 内网服务器，拉取不到 外网数据,所以屏蔽掉请求
         }).on('change', 'selectBusiness', function() {
             var val = $(this).val() - 0;
@@ -155,19 +171,27 @@ function bindEvent() {
 
 }
 
-function isTimeRight(begin, end) {
+function isTimeRight(begin, end, isChart) {
     if (begin > end) {
-        dialog({
+        Dialog({
             header: '时间范围错误',
             body: '结束时间必须在开始时间之后！'
         });
         return false;
     } else if (end - maxDate > begin) {
-        dialog({
+        Dialog({
             header: '时间范围错误',
             body: '结束时间和开始时间间隔需在三天之内！'
         });
         return false;
+    } else if (isChart) {
+        if (end - onDate > begin) {
+            Dialog({
+                header: '时间范围错误',
+                body: '图表时间范围请控制在一天之内！'
+            });
+            return false;
+        }
     }
     return true;
 
@@ -184,8 +208,10 @@ function removeValue(value, arr) {
 
 function showLogs(opts, isAdd) {
     opts.id = $('#select-business').val() >> 0; // jshint ignore:line
+    $('.main-table').show();
+    $('#chart-container').remove();
     if (opts.id <= 0 || loading) {
-        !loading && dialog({
+        !loading && Dialog({
             header: '警告',
             body: '请选择一个项目'
         });
@@ -245,7 +271,146 @@ function showLogs(opts, isAdd) {
         }
     });
 }
+function ChartHelper() {
+    var resultArr = [], timeArr = [], chart,
+        getTime = (function () {
+            var dateString;
+            return function (date, type) {
+                var date = new Date(date);
+                switch (type) {
+                    case 'time' :
+                        dateString = date.getHours() + ":" + date.getMinutes();
+                        break;
+                    case 'date' :
+                        dateString = (date.getMonth() - -1) + '-' + date.getDate();
+                        break;
+                    case 'datetime' :
+                        dateString = date.getHours() + ":" + date.getMinutes() + ' ' + (date.getMonth() - -1) + '-' + date.getDate();
+                }
+                return dateString;
+            }
+        })(),
+        formatArr = function (arr, isTime, isSvg) {
+            var countObj = {};
+            countObj.name = isSvg ? '五日均值' : getTime(arr[0].time, 'date');
+            countObj.data = [];
+            for (var l = arr.length; l--;) {
+                countObj.data.push(arr[l].count);
+                if (isTime) {
+                    timeArr.push(getTime(arr[l].time, 'time'));
+                }
+            }
+            countObj.data.reverse();
+            return countObj;
+        },
+        getArray = function (result) {
+            var resultArr = [];
+            resultArr.push(formatArr(result.data, true, false));
+            resultArr.push(formatArr(result.history, false, false));
+            timeArr.reverse();
+            return resultArr;
+        },
+        init = function (result) {
+            resultArr = getArray(result);
+            $('.main-table').hide();
+            var box = $('.main-mid');
+            if (!$.contains(box[0], $('#chart-container')[0])) {
+                box.append('<div id="chart-container"></div>');
+            }
+            var container = $('#chart-container');
+            container.highcharts({
+                chart: {
+                    type: 'spline'
+                },
+                title: {
+                    text: '错误数据统计'
+                },
+                subtitle: {
+                    text: '数据量'
+                },
+                xAxis: {
+                    categories: timeArr
+                },
+                yAxis: {
+                    title: {
+                        text: '错误量'
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br>' + this.x + ': ' + this.y;
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: true
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: resultArr
+            });
+            chart = container.highcharts();
+        },
+        addData = function (result) {
+            console.log(chart);
+            chart && chart.addSeries(result, false);
+            chart && chart.redraw();
+        };
+    return {
+        init: init,
+        addData: addData
+    }
+}
+function showCharts(opts) {
+    if (opts.id <= 0 || loading) {
+        !loading && Dialog({
+            header: '警告',
+            body: '请选择一个项目'
+        });
+        return;
+    }
 
+    loading = true;
+    console.log(Chart);
+    var url = "/errorMessageQueryCount",
+        svgUrl = '/errorMessageSvgCount',
+        chart = new ChartHelper();
+    $.ajax({
+        url: url,
+        data: {
+            id: opts.id,
+            startDate: opts.startDate,
+            endDate: opts.endDate,
+            history: 1
+        },
+        success: function (data) {
+            chart.init(data);
+            loading = false;
+            $.get(svgUrl, {
+                id: opts.id,
+                startDate: opts.startDate,
+                endDate: opts.endDate,
+                withTime: false
+            }, function (data) {
+                data = {
+                    name: '五日均值线',
+                    data: data.svg
+                };
+                chart.addData(data, true);
+            });
+        },
+        error: function () {
+            loading = false;
+        }
+
+    });
+}
 function init() {
     bindEvent();
     $(".datetimepicker").datetimepicker({

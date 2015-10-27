@@ -5,8 +5,11 @@ var mysql = require('mysql'),
 
 GLOBAL.pjconfig = require('../project.json');
 //GLOBAL.DEBUG = true;
-var mysql = "mysql://badjs:pass4badjs@10.134.5.103:3306/badjs";
+
+var mysql ="mysql://badjs:pass4badjs@10.198.30.62:4250/badjs";
+//var mysql = "mysql://badjs:pass4badjs@10.134.5.103:3306/badjs";
 //var mysql = "mysql://root:root@localhost:3306/badjs";
+
 
 orm.connect( mysql, function(err , db) {
     if(err){
@@ -35,13 +38,33 @@ orm.connect( mysql, function(err , db) {
                 console.log("out today");
                 return ;
             }
-            fetch(id , new Date(startDate.getFullYear() + "-" + (startDate.getMonth()+1)+"-"+ (startDate.getDate()+1)+" 00:00:00"));
+            //fetch(id , new Date(startDate.getFullYear() + "-" + (startDate.getMonth()+1)+"-"+ (startDate.getDate()+1)+" 00:00:00"));
 
         })
     }
 
-    fetch(24 , startDate);
+    var list = [47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,30,29,28,27,26,25,24,22,21,20,19,18,51];
+    var i=0, len=list.length;
+    //for(i= 0,s=0; s<5 && list[i];i++,s++){
+    //    fetch(list[i] , startDate);
+    //}
 
+    fetch(24, startDate);
+    //setTimeout(function () {
+    //    var thisFn = arguments.callee;
+    //    if (list.length) {
+    //        fetch(list.pop(), startDate);
+    //        setTimeout(thisFn, 1000);
+    //    }
+    //}, 1000);
+
+    //var timer = setInterval(function(){
+    //    if(i < len){
+    //        fetch(list[i++], startDate);
+    //    }else{
+    //        clearInterval(timer);
+    //    }
+    //},1000);
 });
 
 

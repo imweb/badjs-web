@@ -1,4 +1,3 @@
-/* global GLOBAL */
 /**
  * Created by chriscai on 2014/12/16.
  */
@@ -12,21 +11,19 @@ var log4js = require('log4js'),
 
 var request = require("request");
 
+var LogService = function () {
 
-
-var LogService = function() {
-
-    /*
-        if(GLOBAL.DEBUG){
-            this.queryUrl = 'http://localhost:9000/query';
-        }else {
-            this.queryUrl = 'http://10.143.132.205:9000/query';
-            this.pushProjectUrl = 'http://10.143.132.205:9001/getProjects';
-        }
-    */
+    /* if(GLOBAL.DEBUG){
+     this.queryUrl = 'http://localhost:9000/query';
+     }else {
+     this.queryUrl = 'http://10.143.132.205:9000/query';
+     this.pushProjectUrl = 'http://10.143.132.205:9001/getProjects';
+     //}*/
+    
 
     this.queryUrl = GLOBAL.pjconfig.storage.queryUrl;
     this.pushProjectUrl = GLOBAL.pjconfig.acceptor.pushProjectUrl;
+    this.querySvgUrl = GLOBAL.pjconfig.storage.querySvgUrl;
     this.pushProjectUrl2 = GLOBAL.pjconfig.openapi.pushProjectUrl;
 
     // this.url = 'http://127.0.0.1:9000/query';
@@ -34,44 +31,64 @@ var LogService = function() {
 };
 
 
-
 LogService.prototype = {
-    query: function(params, callback) {
+    query: function (params, callback, type) {
 
-        var strParams = '';
+        var strParams = '', queryUrl = '';
         for (var key in params) {
             if (key == 'index') {
                 strParams += key + '=' + params[key] + '&';
             } else {
                 strParams += key + '=' + JSON.stringify(params[key]) + '&';
+
             }
         }
         strParams += '_=1';
         logger.debug('query param : ' + strParams);
-        http.get(this.queryUrl + '?' + strParams, function(res) {
+        switch (type) {
+            case 'svg':
+                queryUrl = this.querySvgUrl;
+                break;
+            case 'count' :
+                queryUrl = this.queryCountUrl;
+                break;
+            default :
+                queryUrl = this.queryUrl;
+        }
+        logger.info('the query url is '+queryUrl);
+        http.get(queryUrl + '?' + strParams, function (res) {
             var buffer = '';
-            res.on('data', function(chunk) {
+            res.on('data', function (chunk) {
                 buffer += chunk.toString();
-            }).on('end', function() {
+            }).on('end', function () {
                 try {
-                    callback(null, JSON.parse(buffer));
+                    if(global.debug){
+		         logger.debug(buffer);
+                    }
+		    callback(null, JSON.parse(buffer))
                 } catch (e) {
                     callback(e);
                 }
-            });
+            })
 
-        }).on('error', function(err) {
+        }).on('error', function (err) {
             logger.warn('error :' + err);
             callback(err);
         });
     },
-    pushProject: function(callback) {
+    queryCount: function (params, callback) {
+        this.query(params, callback, 'count');
+    },
+    queryHistorySvg: function (params, callback) {
+        this.query(params, callback, 'svg');
+    },
+    pushProject: function (callback) {
         var self = this;
 
         callback || (callback = function() {});
 
         var businessService = new BusinessService();
-
+        
         var push = function() {
 
             businessService.findBusiness(function(err, item) {

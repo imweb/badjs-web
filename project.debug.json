@@ -2,12 +2,14 @@
     "host" : "http://badjs.server.com/",
     "port": 8081,
     "mysql" : {
-        "url" : "mysql://root:root@localhost:3306/badjs"
+        "url" : "mysql://root@localhost:3306/badjs"
     },
     "storage" : {
         "errorMsgTopUrl" : "http://127.0.0.1:9000/errorMsgTop",
         "errorMsgTopCacheUrl" : "http://127.0.0.1:9000/errorMsgTopCache",
-        "queryUrl" : "http://127.0.0.1:9000/query"
+        "queryUrl" : "http://127.0.0.1:9000/query",
+        "queryCountUrl": "http://127.0.0.1:9000/queryCount",
+        "querySvgUrl": "http://127.0.0.1:9000/errorCountSvg"
     },
     "acceptor": {
         "pushProjectUrl" : "http://127.0.0.1:9001/getProjects"
@@ -20,12 +22,19 @@
       "subscribe" : "badjs"
     },
     "email": {
-        "homepage": "http://badjs.server.com/user/index.html",
-        "from": "noreply-badjs@tencent.com",
+        "homepage": "http://badjs.sng.local/user/index.html",
+        "from": "badjs-vip@tencent.com",
         "emailSuffix" : "@tencent.com",
         "smtp": "smtp.tencent.com",
         "time": "09:00:00",
         "top": 20,
         "module": "email"
+    },
+    "postgreSql": {
+        "connString": "postgres://tdw_v_zscai:234516038@pub-bi-tdw.oa.com:5432/sng_vas_speedtest_database"
+    },
+    "fileStorage":{
+        "pageid":"./fileStorage/pageid.json",
+        "threshold":"./fileStorage/threshold.json"
     }
 }

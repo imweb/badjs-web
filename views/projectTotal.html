@@ -1,4 +1,4 @@
-<%=include('./common/commonLinks.html')(it, opt)%>
+<%=include('./common/w2uiLink.html')(it, opt)%>
 
 <%=include('./common/header.html')(it, opt)%>
 
@@ -6,19 +6,16 @@
     <div class="wrap">
         <!--<%=include('./common/leftSide.html')(it, opt)%>-->
         <div class="mid-side">
-            <table id="chart-table" class="table table-condensed"></table>
-            <div id="chartsContainer"  class="main-mid">
-
+            <div id="grid" style="width: 100%; height: 800px;">
             </div>
-
         </div>
         <div class="right-side">
 
             <section>
                 <label class="setting-title">统计项目：</label>
-                <select class="form-control "  id="select-chartBusiness">
+                <select class="form-control " id="select-chartBusiness">
                     <option value="-1">-- 全部项目 --</option>
-                    <%  for(var i = 0 ; i < it.items.length ;i ++){
+                    <% for(var i = 0 ; i < it.items.length ;i ++){
                     var itemOne = it.items[i];
 
                     %>
@@ -28,7 +25,7 @@
             </section>
             <section>
                 <label class="setting-title">时间范围：</label>
-                <select disabled  class="form-control" id="select-timeScope">
+                <select disabled class="form-control" id="select-timeScope">
                     <option value="1">最近七天</option>
                     <option value="2">最近一个月</option>
                 </select>
