@@ -42,11 +42,14 @@ module.exports = function (app) {
         UserAction.login({}, req, res);
     });
 
+    app.use('/register.html', function (req , res){
+        UserAction.register({}, req , res);
+    } );
 
-    app.get('/user/apply.html', function (req, res) {
-        var user = req.session.user;
-        if (req.query && req.query.applyId) {
-            ApplyAction.queryByApplyId({applyId: req.query.applyId}, function (err, apply) {
+    app.get('/user/apply.html', function(req, res){
+        var user  = req.session.user;
+        if(req.query && req.query.applyId){
+            ApplyAction.queryByApplyId({applyId :req.query.applyId } , function (err , apply){
                 if (apply.status != 1) {
                     res.render('apply', {layout: false, user: user, index: 'apply', apply: apply});
                 } else {
@@ -62,8 +65,11 @@ module.exports = function (app) {
         res.render('applyList', {layout: false, user: user, index: 'manage', manageTitle: '申请列表'});
     });
 
-    app.get('/user/userManage.html', function (req, res) {
-        UserAction.index({}, req, res);
+    app.get('/user/userManage.html', function (req , res){
+        UserAction.index({} , req , res);
+    });
+    app.use('/user/modifyUser.html', function (req , res){
+        UserAction.modify(req.param  , req , res);
     });
 
     app.get('/user/authUserManage.html', function (req, res) {

@@ -1,26 +1,32 @@
-webpackJsonp([7],{
+webpackJsonp([5],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var log  =__webpack_require__(12);
-
+	var log = __webpack_require__(12);
 	log.init();
+
+	var source_trigger = __webpack_require__(13);
+	source_trigger.init();
+
+	var last_select = __webpack_require__(14);
+	last_select.init();
 
 /***/ },
 
 /***/ 12:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($, _) {var Dialog = __webpack_require__(21);
-	var Chart = __webpack_require__(22);
-	var Delegator = __webpack_require__(19);
+	/* WEBPACK VAR INJECTION */(function($, _) {/* global _ */
+	var Dialog = __webpack_require__(108);
+	var Chart = __webpack_require__(109);
+	var Delegator = __webpack_require__(20);
 
-	var logTable = __webpack_require__(112);
-	var keyword = __webpack_require__(113);
-	var debar = __webpack_require__(114);
+	var logTable = __webpack_require__(113);
+	var keyword = __webpack_require__(114);
+	var debar = __webpack_require__(115);
 
-	__webpack_require__(18);
+	__webpack_require__(21);
 
 	var logConfig = {
 	        id: 0,
@@ -32,7 +38,7 @@ webpackJsonp([7],{
 	        level: [4]
 	    },
 
-	    encodeHtml = function (str) {
+	    encodeHtml = function(str) {
 	        return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
 	    };
 
@@ -40,6 +46,11 @@ webpackJsonp([7],{
 	var maxDate = 60 * 60 * 1000 * 24 * 2,
 	    onDate = 60 * 60 * 1000 * 24;
 
+	var currentSelectId = -1,
+	    currentIndex = 0,
+	    noData = false,
+	    MAX_LIMIT = 500,
+	    loading = false;
 
 	var currentSelectId = -1, currentIndex = 0, noData = false, MAX_LIMIT = 500, loading = false;
 
@@ -48,8 +59,13 @@ webpackJsonp([7],{
 	    if (value !== '') {
 	        if (!removeValue(value, logConfig.include)) {
 	            $('#keyword-group').append(keyword({
-	                it: {value: value},
-	                opt: {encodeHtml: encodeHtml, set: Delegator.set}
+	                it: {
+	                    value: value
+	                },
+	                opt: {
+	                    encodeHtml: encodeHtml,
+	                    set: Delegator.set
+	                }
 	            }));
 	        }
 	        logConfig.include.push(value);
@@ -61,43 +77,52 @@ webpackJsonp([7],{
 	    var value = $.trim($('#debar-ipt').val());
 	    if (value !== '') {
 	        if (!removeValue(value, logConfig.exclude)) {
-	            $('#debar-group').append(debar({it: {value: value}, opt: {encodeHtml: encodeHtml, set: Delegator.set}}));
+	            $('#debar-group').append(debar({
+	                it: {
+	                    value: value
+	                },
+	                opt: {
+	                    encodeHtml: encodeHtml,
+	                    set: Delegator.set
+	                }
+	            }));
 	        }
 	        logConfig.exclude.push(value);
 	        $('#debar-ipt').val('');
 	    }
 	}
 
-
 	function bindEvent() {
 	    new Delegator(document.body)
-	        .on('click', 'searchBusiness', function () {
+	        .on('click', 'searchBusiness', function() {
 	            // search business
 	        }).on('click', 'addKeyword', addKeyword)
-	        .on('keyup', 'addKeyword', function (e) {
+	        .on('keyup', 'addKeyword', function(e) {
 	            if (e.which === 13) addKeyword();
-	        }).on('click', 'removeKeywords', function () {
+	        }).on('click', 'removeKeywords', function() {
 	            logConfig.include.length = 0;
 	            $('#keyword-group').empty();
-	        }).on('click', 'removeKeyword', function (e, value) {
+	        }).on('click', 'removeKeyword', function(e, value) {
 	            $(this).closest('.keyword-tag').remove();
 	            removeValue(value, logConfig.include);
 	        }).on('click', 'addDebar', addDebar)
-	        .on('keyup', 'addDebar', function (e) {
+	        .on('keyup', 'addDebar', function(e) {
 	            if (e.which === 13) addDebar();
-	        }).on('click', 'removeDebars', function () {
+	        }).on('click', 'removeDebars', function() {
 	            logConfig.exclude.length = 0;
 	            $('#debar-group').empty();
-	        }).on('click', 'removeDebar', function (e, value) {
+	        }).on('click', 'removeDebar', function(e, value) {
 	            $(this).closest('.keyword-tag').remove();
 	            removeValue(value, logConfig.exclude);
-	        }).on('click', 'showLogs', function () {
+	        }).on('click', 'showLogs', function() {
 	            var startTime = $('#startTime').val(),
 	                endTime = $('#endTime').val();
-	            //console.log('data', endTime);
-	            logConfig.startDate = startTime == '' ? new Date().getTime() - maxDate : new Date(startTime).getTime();
-	            logConfig.endDate = endTime == '' ? new Date().getTime() : new Date(endTime).getTime();
-	            //console.log('data', logConfig);
+	            logConfig.startDate = startTime === '' ?
+	                new Date().getTime() - maxDate :
+	                new Date(startTime).getTime();
+	            logConfig.endDate = endTime === '' ?
+	                new Date().getTime() :
+	                new Date(endTime).getTime();
 	            //测试时间是否符合
 	            if (isTimeRight(logConfig.startDate, logConfig.endDate)) {
 	                showLogs(logConfig, false);
@@ -116,17 +141,14 @@ webpackJsonp([7],{
 	            }
 	        }).on('click', 'showSource', function (e, data) {
 	            // 内网服务器，拉取不到 外网数据,所以屏蔽掉请求
-
-	        }).on('change', 'selectBusiness', function () {
+	        }).on('change', 'selectBusiness', function() {
 	            var val = $(this).val() - 0;
 	            currentSelectId = val;
 	            $('#log-table').html('');
 	            currentIndex = 0;
 	            noData = false;
 	            logConfig.id = val;
-	            //  showLogs(logConfig, false);
-
-	        }).on('click', 'errorTypeClick', function () {
+	        }).on('click', 'errorTypeClick', function() {
 	            if ($(this).hasClass('msg-dis')) {
 	                logConfig.level.push(4);
 	                $(this).removeClass('msg-dis');
@@ -134,10 +156,7 @@ webpackJsonp([7],{
 	                logConfig.level.splice($.inArray(4, logConfig.level), 1);
 	                $(this).addClass('msg-dis');
 	            }
-	            console.log('log', logConfig.level);
-	            // showLogs(logConfig, false);
-
-	        }).on('click', 'logTypeClick', function () {
+	        }).on('click', 'logTypeClick', function() {
 	            if ($(this).hasClass('msg-dis')) {
 	                logConfig.level.push(2);
 	                $(this).removeClass('msg-dis');
@@ -145,10 +164,7 @@ webpackJsonp([7],{
 	                logConfig.level.splice($.inArray(2, logConfig.level), 1);
 	                $(this).addClass('msg-dis');
 	            }
-
-	            //   showLogs(logConfig, false);
-
-	        }).on('click', 'debugTypeClick', function () {
+	        }).on('click', 'debugTypeClick', function() {
 	            if ($(this).hasClass('msg-dis')) {
 	                logConfig.level.push(1);
 	                $(this).removeClass('msg-dis');
@@ -156,10 +172,9 @@ webpackJsonp([7],{
 	                logConfig.level.splice($.inArray(1, logConfig.level), 1);
 	                $(this).addClass('msg-dis');
 	            }
-	            //     showLogs(logConfig, false);
 	        });
 
-	    var throttled = _.throttle(function (e) {
+	    var throttled = _.throttle(function(e) {
 	        var $this = $(this);
 	        var top = $this.scrollTop();
 	        var height = $this.height();
@@ -169,9 +184,8 @@ webpackJsonp([7],{
 	            logConfig.id = currentSelectId;
 	            showLogs(logConfig, true);
 	        }
-
-
 	    }, 100);
+
 	    $('.main-mid').scroll(throttled);
 
 	}
@@ -201,6 +215,7 @@ webpackJsonp([7],{
 	    return true;
 
 	}
+
 	function removeValue(value, arr) {
 	    for (var l = arr.length; l--;) {
 	        if (arr[l] === value) {
@@ -211,6 +226,7 @@ webpackJsonp([7],{
 
 
 	function showLogs(opts, isAdd) {
+	    opts.id = $('#select-business').val() >> 0; // jshint ignore:line
 	    $('.main-table').show();
 	    $('#chart-container').remove();
 	    if (opts.id <= 0 || loading) {
@@ -241,29 +257,35 @@ webpackJsonp([7],{
 	            _t: new Date() - 0,
 	            level: opts.level
 	        },
-	        success: function (data) {
+	        success: function(data) {
 	            var ret = data.ret;
-	            if (ret == 0) {
+	            if (ret === 0) {
 	                var param = {
 	                    encodeHtml: encodeHtml,
 	                    set: Delegator.set,
 	                    startIndex: currentIndex * MAX_LIMIT
-	                }
+	                };
 
 	                if (isAdd) {
-	                    $('#log-table').append(logTable({it: data.data, opt: param}));
+	                    $('#log-table').append(logTable({
+	                        it: data.data,
+	                        opt: param
+	                    }));
 	                } else {
-	                    $('#log-table').html(logTable({it: data.data, opt: param}));
+	                    $('#log-table').html(logTable({
+	                        it: data.data,
+	                        opt: param
+	                    }));
 	                }
 
 	                currentIndex++;
-	                if (data.data.length == 0) {
+	                if (data.data.length === 0) {
 	                    noData = true;
 	                }
 	            }
 	            loading = false;
 	        },
-	        error: function () {
+	        error: function() {
 	            loading = false;
 	        }
 	    });
@@ -410,20 +432,266 @@ webpackJsonp([7],{
 	}
 	function init() {
 	    bindEvent();
-	    $(".datetimepicker").datetimepicker({format: 'YYYY-MM-DD HH:mm'}).data("DateTimePicker").setMaxDate(new Date());
+	    $(".datetimepicker").datetimepicker({
+	        format: 'YYYY-MM-DD HH:mm'
+	    }).data("DateTimePicker").setMaxDate(new Date());
 
 	    $('#startTime').data("DateTimePicker").setDate(new Date(new Date() - maxDate));
 	    $('#endTime').data("DateTimePicker").setDate(new Date());
 	}
 
 	exports.init = init;
-
-
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(4)))
 
 /***/ },
 
-/***/ 18:
+/***/ 13:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {exports.init = function() {
+		var not_show_source_page = false;
+		var hideform_class_name = 'main-table-hidefrom';
+
+		try {
+			not_show_source_page = !!localStorage.not_show_source_page;
+			$('.main-table')[not_show_source_page ? 'addClass' : 'removeClass'](hideform_class_name);
+		} catch (ex) {}
+
+		var update_source = function(show_source_page) {
+			if (show_source_page) {
+				$('.main-table').removeClass(hideform_class_name);
+				$('#log-table .source_page_link').each(function() {
+					var $this = $(this);
+					$this.text($this.data('viewlink'));
+				});
+			} else {
+				$('.main-table').addClass(hideform_class_name);
+				$('#log-table .source_page_link').each(function() {
+					var $this = $(this);
+					$this.text($this.data('viewtext'));
+				});
+			}
+		};
+
+		var $ssp = $('#show_source_page');
+		$ssp.prop('checked', !not_show_source_page).on('change', function() {
+			try {
+				var show_source_page = $ssp.prop('checked');
+				localStorage.not_show_source_page = show_source_page ? '' : '1';
+				update_source(show_source_page);
+			} catch (ex) {}
+		});
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ },
+
+/***/ 14:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {exports.init = function(){
+		var last_select = -1;
+		
+		try {
+
+		    last_select = localStorage.last_select >> 0; // jshint ignore:line
+			
+			var $sb = $('#select-business');
+			
+			last_select > 0 && $sb.find('[value=' + last_select + ']').length && $sb.val(last_select);
+
+			$sb.on('change', function(){
+				localStorage.last_select = $sb.val();
+			});
+
+		} catch (ex) {}
+
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ },
+
+/***/ 20:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {/**
+	 * Map
+	 * @class
+	 */
+	function Map() {
+	    this.map = {};
+	    this.length = 0;
+	}
+	Map.prototype = {
+	    constructor: Map,
+	    /**
+	     * has
+	     * @param {String} key
+	     * @returns {Boolean}
+	     */
+	    has: function (key) {
+	        return (key in this.map);
+	    },
+	    /**
+	     * get
+	     * @param {String} key
+	     * @returns {Any}
+	     */
+	    get: function (key) {
+	        return this.map[key];
+	    },
+	    /**
+	     * set
+	     * @param {String} key
+	     * @param {Any} value
+	     */
+	    set: function (key, value) {
+	        !this.has(key) && this.length++;
+	        return (this.map[key] = value);
+	    },
+	    /**
+	     * count
+	     * @returns {Number}
+	     */
+	    count: function () {
+	        return this.length;
+	    },
+	    /**
+	     * remove
+	     * @param {String} key
+	     */
+	    remove: function (key) {
+	        if (this.has(key)) {
+	            this.map[key] = null;
+	            delete this.map[key];
+	            this.length--;
+	        }
+	    }
+	};
+
+	var cache = new Map(), set = cache.set, uid = 0;
+	cache.set = function (node, value) {
+	    if (!value) {
+	        value = node;
+	        set.call(cache, ++uid + '', value);
+	        return uid;
+	    } else {
+	        typeof node === 'string' &&
+	        (node = $(node)[0]);
+	        $.data(node, 'event-data', value);
+	        return this;
+	    }
+	};
+
+	function _key(arr) {
+	    if (!arr) return {};
+	    arr = arr.split(' ');
+	    var obj = {};
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	        obj[arr[i]] = true;
+	    }
+	    return obj;
+	}
+
+	/**
+	 * Delegator
+	 * @class
+	 * @param {Selector} container
+	 */
+	function Delegator(container) {
+	    this.container = $(container);
+	    this.listenerMap = new Map();
+	}
+
+	/**
+	 * getKey
+	 * @param {Any} value
+	 * @returns {Number}
+	 */
+	Delegator.set = cache.set;
+	/**
+	 * cache
+	 * @class
+	 * @static
+	 */
+	Delegator.cache = cache;
+
+	Delegator.prototype = {
+	    constructor: Delegator,
+	    _getListener: function (type) {
+	        if (this.listenerMap.has(type)) {
+	            return this.listenerMap.get(type);
+	        }
+	        function listener(e) {
+	            var data = $.data(this),
+	                routes = data['event-' + type + '-routes'],
+	                eventData = data['event-data'], handle, dataKey;
+
+	            // preprocessing
+	            if (!routes && (routes = this.getAttribute('data-event-' + type))) {
+	                (routes = routes.split(' ')) &&
+	                (data['event-' + type + '-routes'] = routes);
+	                !eventData &&
+	                (dataKey = this.getAttribute('data-event-data')) &&
+	                (eventData = cache.get(dataKey)) &&
+	                (data['event-data'] = eventData) &&
+	                (cache.remove(dataKey));
+	                !data['event-stop-propagation'] &&
+	                (data['event-stop-propagation'] = _key(this.getAttribute('data-event-stop-propagation')));
+	            }
+
+	            if (routes) {
+	                for (var i = 0, l = routes.length; i < l; i++) {
+	                    handle = listener.handleMap.get(routes[i]);
+
+	                    if (handle) {
+	                        handle.call(this, e, eventData);
+	                    }
+	                    data['event-stop-propagation'][type] &&
+	                    e.stopPropagation();
+	                }
+	            }
+	        }
+
+	        listener.handleMap = new Map();
+	        this.listenerMap.set(type, listener);
+	        this.container.on(type, '[data-event-' + type + ']', listener);
+	        return listener;
+	    },
+	    /**
+	     * on
+	     * @param {String} type
+	     * @param {String} name
+	     * @param {Function} handle
+	     */
+	    on: function (type, name, handle) {
+	        var listener = this._getListener(type);
+	        listener.handleMap.set(name, handle);
+	        return this;
+	    },
+	    /**
+	     * off
+	     * @param {String} type
+	     * @param {String} name
+	     */
+	    off: function (type, name) {
+	        var listener = this._getListener(type),
+	            handleMap = listener.handleMap;
+	        handleMap.remove(name);
+	        if (!handleMap.count()) {
+	            this.container.off(type, '[data-event-' + type + ']', listener);
+	            this.listenerMap.remove(type);
+	        }
+	    }
+	};
+
+	module.exports = Delegator;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ },
+
+/***/ 21:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -2282,191 +2550,11 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 19:
+/***/ 108:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {/**
-	 * Map
-	 * @class
-	 */
-	function Map() {
-	    this.map = {};
-	    this.length = 0;
-	}
-	Map.prototype = {
-	    constructor: Map,
-	    /**
-	     * has
-	     * @param {String} key
-	     * @returns {Boolean}
-	     */
-	    has: function (key) {
-	        return (key in this.map);
-	    },
-	    /**
-	     * get
-	     * @param {String} key
-	     * @returns {Any}
-	     */
-	    get: function (key) {
-	        return this.map[key];
-	    },
-	    /**
-	     * set
-	     * @param {String} key
-	     * @param {Any} value
-	     */
-	    set: function (key, value) {
-	        !this.has(key) && this.length++;
-	        return (this.map[key] = value);
-	    },
-	    /**
-	     * count
-	     * @returns {Number}
-	     */
-	    count: function () {
-	        return this.length;
-	    },
-	    /**
-	     * remove
-	     * @param {String} key
-	     */
-	    remove: function (key) {
-	        if (this.has(key)) {
-	            this.map[key] = null;
-	            delete this.map[key];
-	            this.length--;
-	        }
-	    }
-	};
-
-	var cache = new Map(), set = cache.set, uid = 0;
-	cache.set = function (node, value) {
-	    if (!value) {
-	        value = node;
-	        set.call(cache, ++uid + '', value);
-	        return uid;
-	    } else {
-	        typeof node === 'string' &&
-	        (node = $(node)[0]);
-	        $.data(node, 'event-data', value);
-	        return this;
-	    }
-	};
-
-	function _key(arr) {
-	    if (!arr) return {};
-	    arr = arr.split(' ');
-	    var obj = {};
-	    for (var i = 0, l = arr.length; i < l; i++) {
-	        obj[arr[i]] = true;
-	    }
-	    return obj;
-	}
-
-	/**
-	 * Delegator
-	 * @class
-	 * @param {Selector} container
-	 */
-	function Delegator(container) {
-	    this.container = $(container);
-	    this.listenerMap = new Map();
-	}
-
-	/**
-	 * getKey
-	 * @param {Any} value
-	 * @returns {Number}
-	 */
-	Delegator.set = cache.set;
-	/**
-	 * cache
-	 * @class
-	 * @static
-	 */
-	Delegator.cache = cache;
-
-	Delegator.prototype = {
-	    constructor: Delegator,
-	    _getListener: function (type) {
-	        if (this.listenerMap.has(type)) {
-	            return this.listenerMap.get(type);
-	        }
-	        function listener(e) {
-	            var data = $.data(this),
-	                routes = data['event-' + type + '-routes'],
-	                eventData = data['event-data'], handle, dataKey;
-
-	            // preprocessing
-	            if (!routes && (routes = this.getAttribute('data-event-' + type))) {
-	                (routes = routes.split(' ')) &&
-	                (data['event-' + type + '-routes'] = routes);
-	                !eventData &&
-	                (dataKey = this.getAttribute('data-event-data')) &&
-	                (eventData = cache.get(dataKey)) &&
-	                (data['event-data'] = eventData) &&
-	                (cache.remove(dataKey));
-	                !data['event-stop-propagation'] &&
-	                (data['event-stop-propagation'] = _key(this.getAttribute('data-event-stop-propagation')));
-	            }
-
-	            if (routes) {
-	                for (var i = 0, l = routes.length; i < l; i++) {
-	                    handle = listener.handleMap.get(routes[i]);
-
-	                    if (handle) {
-	                        handle.call(this, e, eventData);
-	                    }
-	                    data['event-stop-propagation'][type] &&
-	                    e.stopPropagation();
-	                }
-	            }
-	        }
-
-	        listener.handleMap = new Map();
-	        this.listenerMap.set(type, listener);
-	        this.container.on(type, '[data-event-' + type + ']', listener);
-	        return listener;
-	    },
-	    /**
-	     * on
-	     * @param {String} type
-	     * @param {String} name
-	     * @param {Function} handle
-	     */
-	    on: function (type, name, handle) {
-	        var listener = this._getListener(type);
-	        listener.handleMap.set(name, handle);
-	        return this;
-	    },
-	    /**
-	     * off
-	     * @param {String} type
-	     * @param {String} name
-	     */
-	    off: function (type, name) {
-	        var listener = this._getListener(type),
-	            handleMap = listener.handleMap;
-	        handleMap.remove(name);
-	        if (!handleMap.count()) {
-	            this.container.off(type, '[data-event-' + type + ']', listener);
-	            this.listenerMap.remove(type);
-	        }
-	    }
-	};
-
-	module.exports = Delegator;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
-
-/***/ },
-
-/***/ 21:
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(19);
-	var modal = __webpack_require__(120);
+	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(20);
+	var modal = __webpack_require__(121);
 
 	    var container;
 
@@ -2514,7 +2602,7 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 22:
+/***/ 109:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery) {/*
@@ -2827,7 +2915,7 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 112:
+/***/ 113:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_) {module.exports = function (obj) {
@@ -2838,50 +2926,81 @@ webpackJsonp([7],{
 
 
 	var urls;
-	for (var i = 0 , l = it.length, type; i < l; i++) {
-	switch(it[i].level) {
-	    case '8':
-	        type = 'warning';
-	        break;
-	    case '4':
-	        type = 'err';
-	        break;
-	    case '2':
-	        type = 'info';
-	        break;
-	    case '1':
-	        type = 'debug';
-	        break;
+	var not_show_source_page = false;
+	try {
+	    not_show_source_page = !!localStorage.not_show_source_page;
+	} catch (ex) {}
+
+	function getBrowserType(ua){
+	    if(!ua){
+	        return '';
+	    }
+	    ua = ua.toLowerCase();
+
+	    if(ua.indexOf('qqbrowser')>-1){
+	        return  'ico-qb';
+	    }else if(ua.indexOf('metasr')>-1){
+	        return  'ico-sougou';
+	    }else if(ua.indexOf('maxthon')>-1){
+	        return  'ico-maxthon';
+	    }else if(ua.indexOf('360se')>-1){
+	        return  'ico-360';
+	    }else if(ua.indexOf('qq/')>-1){
+	        return  'ico-qq';
+	    }else if(ua.indexOf('micromessenger')>-1){
+	        return  'ico-wx';
+	    }else if(ua.indexOf('chrome')>-1){
+	        return  'ico-chrome';
+	    }else if(ua.indexOf('msie')>-1 || ua.indexOf('trident')>-1 ){
+	        return 'ico-ie';
+	    }else if(ua.indexOf('firefox')>-1){
+	        return 'ico-ff';
+	    }else if(ua.indexOf('safari')>-1){
+	        return 'ico-safari';
+	    }else if(ua.indexOf('android')>-1){
+	        return  'ico-android';
+	    }else if(ua.indexOf('iphone')>-1){
+	        return  'ico-ios';
+	    }
 	}
 
-	 function getBrowserType(ua){
-	        if(!ua){
-	            return '';
+	function sourcePage(data, type, opt) {
+	    var from = data.from || ''
+	    if (/view/.test(type)) {
+	        var view = ['页面查看', opt.encodeHtml(from)];
+	        return 'viewtext' === type ? view[0] :
+	            'viewlink' === type ? view[1] :
+	            not_show_source_page ? view[0] : view[1];
+	    } else {
+	        var href = opt.encodeHtml(from);
+	        var msg = [data._target, data.rowNum, data.colNum].join(':') + ' ' + data.msg;
+	        if (href.indexOf('#') === -1) {
+	            href += '#BJ_ERROR=' + encodeURIComponent(msg);
+	        } else {
+	            href += '&BJ_ERROR=' + encodeURIComponent(msg);
 	        }
-	        ua = ua.toLowerCase();
-
-	        if(ua.indexOf('qqbrowser')>-1){
-	            return  'ico-qb';
-	        }else if(ua.indexOf('qq/')>-1){
-	            return  'ico-qq';
-	        }else if(ua.indexOf('micromessenger')>-1){
-	            return  'ico-wx';
-	        }else if(ua.indexOf('chrome')>-1){
-	            return  'ico-chrome';
-	        }else if(ua.indexOf('msie')>-1 || ua.indexOf('trident')>-1 ){
-	            return 'ico-ie';
-	        }else if(ua.indexOf('firefox')>-1){
-	            return 'ico-ff';
-	        }else if(ua.indexOf('safari')>-1){
-	            return 'ico-safari';
-	        }else if(ua.indexOf('android')>-1){
-	            return  'ico-android';
-	        }else if(ua.indexOf('iphone')>-1){
-	            return  'ico-ios';
-	        }
+	        return href;
+	    }
 	}
 
-	var isHtml = /^.+?\.html\??/.test(it[i].target);
+	for (var i = 0 , l = it.length, type = ''; i < l; i++) {
+	    switch(it[i].level.toString()) {
+	        case '8':
+	            type = 'warning';
+	            break;
+	        case '4':
+	            type = 'err';
+	            break;
+	        case '2':
+	            type = 'info';
+	            break;
+	        case '1':
+	            type = 'debug';
+	            break;
+	    }
+
+	    var isHtml = /^.+?\.html\??/.test(it[i].target);
+	    var _target = it[i]._target = (it[i].target || it[i].url || '').replace(/\)/g, '');
 	;
 	__p += '\r\n<tr id="tr-' +
 	((__t = (i + 1 + opt.startIndex)) == null ? '' : __t) +
@@ -2901,26 +3020,28 @@ webpackJsonp([7],{
 	((__t = ( getBrowserType(it[i].userAgent))) == null ? '' : __t) +
 	'" title="' +
 	((__t = (it[i].userAgent)) == null ? '' : __t) +
-	'"></span></td>\r\n    <td class="td-7">\r\n  ';
-	if(false){;
-	__p += '\r\n        <a style="word-break:break-all;display: block" >\r\n  ';
-	}else {;
-	__p += '\r\n        <a style="word-break:break-all;display: block" href="javascript:;" data-event-click="showSource" data-event-data="' +
+	'"></span></td>\r\n    <td class="td-7">\r\n        <a\r\n            style="word-break:break-all;display:block"\r\n            href="' +
+	((__t = ( opt.encodeHtml(_target))) == null ? '' : __t) +
+	'"\r\n            target="_blank"\r\n            data-event-click="showSource"\r\n            data-event-data="' +
 	((__t = (opt.set(it[i]))) == null ? '' : __t) +
-	'">\r\n  ';
-	};
-	__p += '\r\n\r\n        ' +
-	((__t = ( opt.encodeHtml(it[i].target || it[i].url || ''))) == null ? '' : __t) +
-	'</a>\r\n        <span class="err-where">' +
-	((__t = (opt.encodeHtml(it[i].rowNum || 0) )) == null ? '' : __t) +
-	'行' +
+	'"\r\n        >\r\n            ' +
+	((__t = (opt.encodeHtml(_target))) == null ? '' : __t) +
+	'\r\n            <span\r\n                class="err-where"\r\n                style="height:24px;line-height:24px;border-radius:3px"\r\n            >\r\n                ' +
+	((__t = (opt.encodeHtml(it[i].rowNum || 0))) == null ? '' : __t) +
+	'行\r\n                ' +
 	((__t = (opt.encodeHtml(it[i].colNum || 0))) == null ? '' : __t) +
-	'列</span>\r\n        <a style="font-size:12px;" href="' +
-	((__t = ( opt.encodeHtml((it[i].from)) )) == null ? '' : __t) +
-	'" target="_blank">页面查看</a>\r\n    </td>\r\n</tr>\r\n';
+	'列\r\n            </span>\r\n        </a>\r\n        <a\r\n            class="source_page_link"\r\n            style="font-size:12px"\r\n            target="_blank"\r\n            href="' +
+	((__t = (sourcePage(it[i], 'href', opt))) == null ? '' : __t) +
+	'"\r\n            data-viewtext="' +
+	((__t = (sourcePage(it[i], 'viewtext', opt))) == null ? '' : __t) +
+	'"\r\n            data-viewlink="' +
+	((__t = (sourcePage(it[i], 'viewlink', opt))) == null ? '' : __t) +
+	'"\r\n        >' +
+	((__t = (sourcePage(it[i], 'view', opt))) == null ? '' : __t) +
+	'</a>\r\n    </td>\r\n</tr>\r\n';
 	 } ;
 	__p += '\r\n\r\n';
-	 if(it.length == 0 ){;
+	 if(it.length === 0 ){;
 	__p += '\r\n<td colspan="7" style="\r\n    text-align: center;\r\n    background: rgb(221, 221, 221);\r\n">无更多数据</td>\r\n';
 	};
 
@@ -2932,7 +3053,7 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 113:
+/***/ 114:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {
@@ -2951,7 +3072,7 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 114:
+/***/ 115:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {
@@ -2970,7 +3091,7 @@ webpackJsonp([7],{
 
 /***/ },
 
-/***/ 120:
+/***/ 121:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {

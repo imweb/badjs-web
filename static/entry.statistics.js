@@ -3,13 +3,40 @@ webpackJsonp([6],{
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var statistics  = __webpack_require__(15);
-
+	var statistics = __webpack_require__(17);
 	statistics.init();
+
+	var last_select = __webpack_require__(14);
+	last_select.init();
 
 /***/ },
 
-/***/ 15:
+/***/ 14:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {exports.init = function(){
+		var last_select = -1;
+		
+		try {
+
+		    last_select = localStorage.last_select >> 0; // jshint ignore:line
+			
+			var $sb = $('#select-business');
+			
+			last_select > 0 && $sb.find('[value=' + last_select + ']').length && $sb.val(last_select);
+
+			$sb.on('change', function(){
+				localStorage.last_select = $sb.val();
+			});
+
+		} catch (ex) {}
+
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ },
+
+/***/ 17:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {/**
@@ -18,9 +45,9 @@ webpackJsonp([6],{
 	 * */
 
 
-	__webpack_require__(18);
-	var Dialog = __webpack_require__(21);
-	var statisticsTpl = __webpack_require__(115);
+	__webpack_require__(21);
+	var Dialog = __webpack_require__(108);
+	var statisticsTpl = __webpack_require__(117);
 
 	var encodeHtml = function (str) {
 	    return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\x60/g, '&#96;').replace(/\x27/g, '&#39;').replace(/\x22/g, '&quot;');
@@ -68,7 +95,187 @@ webpackJsonp([6],{
 
 /***/ },
 
-/***/ 18:
+/***/ 20:
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {/**
+	 * Map
+	 * @class
+	 */
+	function Map() {
+	    this.map = {};
+	    this.length = 0;
+	}
+	Map.prototype = {
+	    constructor: Map,
+	    /**
+	     * has
+	     * @param {String} key
+	     * @returns {Boolean}
+	     */
+	    has: function (key) {
+	        return (key in this.map);
+	    },
+	    /**
+	     * get
+	     * @param {String} key
+	     * @returns {Any}
+	     */
+	    get: function (key) {
+	        return this.map[key];
+	    },
+	    /**
+	     * set
+	     * @param {String} key
+	     * @param {Any} value
+	     */
+	    set: function (key, value) {
+	        !this.has(key) && this.length++;
+	        return (this.map[key] = value);
+	    },
+	    /**
+	     * count
+	     * @returns {Number}
+	     */
+	    count: function () {
+	        return this.length;
+	    },
+	    /**
+	     * remove
+	     * @param {String} key
+	     */
+	    remove: function (key) {
+	        if (this.has(key)) {
+	            this.map[key] = null;
+	            delete this.map[key];
+	            this.length--;
+	        }
+	    }
+	};
+
+	var cache = new Map(), set = cache.set, uid = 0;
+	cache.set = function (node, value) {
+	    if (!value) {
+	        value = node;
+	        set.call(cache, ++uid + '', value);
+	        return uid;
+	    } else {
+	        typeof node === 'string' &&
+	        (node = $(node)[0]);
+	        $.data(node, 'event-data', value);
+	        return this;
+	    }
+	};
+
+	function _key(arr) {
+	    if (!arr) return {};
+	    arr = arr.split(' ');
+	    var obj = {};
+	    for (var i = 0, l = arr.length; i < l; i++) {
+	        obj[arr[i]] = true;
+	    }
+	    return obj;
+	}
+
+	/**
+	 * Delegator
+	 * @class
+	 * @param {Selector} container
+	 */
+	function Delegator(container) {
+	    this.container = $(container);
+	    this.listenerMap = new Map();
+	}
+
+	/**
+	 * getKey
+	 * @param {Any} value
+	 * @returns {Number}
+	 */
+	Delegator.set = cache.set;
+	/**
+	 * cache
+	 * @class
+	 * @static
+	 */
+	Delegator.cache = cache;
+
+	Delegator.prototype = {
+	    constructor: Delegator,
+	    _getListener: function (type) {
+	        if (this.listenerMap.has(type)) {
+	            return this.listenerMap.get(type);
+	        }
+	        function listener(e) {
+	            var data = $.data(this),
+	                routes = data['event-' + type + '-routes'],
+	                eventData = data['event-data'], handle, dataKey;
+
+	            // preprocessing
+	            if (!routes && (routes = this.getAttribute('data-event-' + type))) {
+	                (routes = routes.split(' ')) &&
+	                (data['event-' + type + '-routes'] = routes);
+	                !eventData &&
+	                (dataKey = this.getAttribute('data-event-data')) &&
+	                (eventData = cache.get(dataKey)) &&
+	                (data['event-data'] = eventData) &&
+	                (cache.remove(dataKey));
+	                !data['event-stop-propagation'] &&
+	                (data['event-stop-propagation'] = _key(this.getAttribute('data-event-stop-propagation')));
+	            }
+
+	            if (routes) {
+	                for (var i = 0, l = routes.length; i < l; i++) {
+	                    handle = listener.handleMap.get(routes[i]);
+
+	                    if (handle) {
+	                        handle.call(this, e, eventData);
+	                    }
+	                    data['event-stop-propagation'][type] &&
+	                    e.stopPropagation();
+	                }
+	            }
+	        }
+
+	        listener.handleMap = new Map();
+	        this.listenerMap.set(type, listener);
+	        this.container.on(type, '[data-event-' + type + ']', listener);
+	        return listener;
+	    },
+	    /**
+	     * on
+	     * @param {String} type
+	     * @param {String} name
+	     * @param {Function} handle
+	     */
+	    on: function (type, name, handle) {
+	        var listener = this._getListener(type);
+	        listener.handleMap.set(name, handle);
+	        return this;
+	    },
+	    /**
+	     * off
+	     * @param {String} type
+	     * @param {String} name
+	     */
+	    off: function (type, name) {
+	        var listener = this._getListener(type),
+	            handleMap = listener.handleMap;
+	        handleMap.remove(name);
+	        if (!handleMap.count()) {
+	            this.container.off(type, '[data-event-' + type + ']', listener);
+	            this.listenerMap.remove(type);
+	        }
+	    }
+	};
+
+	module.exports = Delegator;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+
+/***/ },
+
+/***/ 21:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -1927,191 +2134,11 @@ webpackJsonp([6],{
 
 /***/ },
 
-/***/ 19:
+/***/ 108:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {/**
-	 * Map
-	 * @class
-	 */
-	function Map() {
-	    this.map = {};
-	    this.length = 0;
-	}
-	Map.prototype = {
-	    constructor: Map,
-	    /**
-	     * has
-	     * @param {String} key
-	     * @returns {Boolean}
-	     */
-	    has: function (key) {
-	        return (key in this.map);
-	    },
-	    /**
-	     * get
-	     * @param {String} key
-	     * @returns {Any}
-	     */
-	    get: function (key) {
-	        return this.map[key];
-	    },
-	    /**
-	     * set
-	     * @param {String} key
-	     * @param {Any} value
-	     */
-	    set: function (key, value) {
-	        !this.has(key) && this.length++;
-	        return (this.map[key] = value);
-	    },
-	    /**
-	     * count
-	     * @returns {Number}
-	     */
-	    count: function () {
-	        return this.length;
-	    },
-	    /**
-	     * remove
-	     * @param {String} key
-	     */
-	    remove: function (key) {
-	        if (this.has(key)) {
-	            this.map[key] = null;
-	            delete this.map[key];
-	            this.length--;
-	        }
-	    }
-	};
-
-	var cache = new Map(), set = cache.set, uid = 0;
-	cache.set = function (node, value) {
-	    if (!value) {
-	        value = node;
-	        set.call(cache, ++uid + '', value);
-	        return uid;
-	    } else {
-	        typeof node === 'string' &&
-	        (node = $(node)[0]);
-	        $.data(node, 'event-data', value);
-	        return this;
-	    }
-	};
-
-	function _key(arr) {
-	    if (!arr) return {};
-	    arr = arr.split(' ');
-	    var obj = {};
-	    for (var i = 0, l = arr.length; i < l; i++) {
-	        obj[arr[i]] = true;
-	    }
-	    return obj;
-	}
-
-	/**
-	 * Delegator
-	 * @class
-	 * @param {Selector} container
-	 */
-	function Delegator(container) {
-	    this.container = $(container);
-	    this.listenerMap = new Map();
-	}
-
-	/**
-	 * getKey
-	 * @param {Any} value
-	 * @returns {Number}
-	 */
-	Delegator.set = cache.set;
-	/**
-	 * cache
-	 * @class
-	 * @static
-	 */
-	Delegator.cache = cache;
-
-	Delegator.prototype = {
-	    constructor: Delegator,
-	    _getListener: function (type) {
-	        if (this.listenerMap.has(type)) {
-	            return this.listenerMap.get(type);
-	        }
-	        function listener(e) {
-	            var data = $.data(this),
-	                routes = data['event-' + type + '-routes'],
-	                eventData = data['event-data'], handle, dataKey;
-
-	            // preprocessing
-	            if (!routes && (routes = this.getAttribute('data-event-' + type))) {
-	                (routes = routes.split(' ')) &&
-	                (data['event-' + type + '-routes'] = routes);
-	                !eventData &&
-	                (dataKey = this.getAttribute('data-event-data')) &&
-	                (eventData = cache.get(dataKey)) &&
-	                (data['event-data'] = eventData) &&
-	                (cache.remove(dataKey));
-	                !data['event-stop-propagation'] &&
-	                (data['event-stop-propagation'] = _key(this.getAttribute('data-event-stop-propagation')));
-	            }
-
-	            if (routes) {
-	                for (var i = 0, l = routes.length; i < l; i++) {
-	                    handle = listener.handleMap.get(routes[i]);
-
-	                    if (handle) {
-	                        handle.call(this, e, eventData);
-	                    }
-	                    data['event-stop-propagation'][type] &&
-	                    e.stopPropagation();
-	                }
-	            }
-	        }
-
-	        listener.handleMap = new Map();
-	        this.listenerMap.set(type, listener);
-	        this.container.on(type, '[data-event-' + type + ']', listener);
-	        return listener;
-	    },
-	    /**
-	     * on
-	     * @param {String} type
-	     * @param {String} name
-	     * @param {Function} handle
-	     */
-	    on: function (type, name, handle) {
-	        var listener = this._getListener(type);
-	        listener.handleMap.set(name, handle);
-	        return this;
-	    },
-	    /**
-	     * off
-	     * @param {String} type
-	     * @param {String} name
-	     */
-	    off: function (type, name) {
-	        var listener = this._getListener(type),
-	            handleMap = listener.handleMap;
-	        handleMap.remove(name);
-	        if (!handleMap.count()) {
-	            this.container.off(type, '[data-event-' + type + ']', listener);
-	            this.listenerMap.remove(type);
-	        }
-	    }
-	};
-
-	module.exports = Delegator;
-
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
-
-/***/ },
-
-/***/ 21:
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(19);
-	var modal = __webpack_require__(120);
+	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(20);
+	var modal = __webpack_require__(121);
 
 	    var container;
 
@@ -2159,7 +2186,7 @@ webpackJsonp([6],{
 
 /***/ },
 
-/***/ 115:
+/***/ 117:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {module.exports = function (obj) {
@@ -2169,25 +2196,25 @@ webpackJsonp([6],{
 	with (obj) {
 
 
-
-	  if(!it.data || !it.data[0] || !it.data[0].content[0]){
+	    if (!it.data || !it.data[0] || !it.data[0].content || !it.data[0].content[0]) {
 	;
-	__p += '\r\n        <tr ><td colspan="3" style="text-align: center">当天没有统计数据</td></tr>\r\n';
+	__p += '\r\n    <tr ><td colspan="3" style="text-align: center">当天没有统计数据</td></tr>\r\n';
 
-	  }else {
-	var count = 0 ;
-	var content = it.data[0].content;
-	$.each(content , function (key , value){
+	    } else {
+	        var count = 0 ;
+	        var content = it.data[0].content;
+	        $.each(content , function (key , value) {
 	;
 	__p += '\r\n<tr class="listRow">\r\n    <td>' +
 	((__t = ( ++count )) == null ? '' : __t) +
 	'</td>\r\n    <td>' +
 	((__t = ( value.total )) == null ? '' : __t) +
-	'</td>\r\n    <td>\r\n        ' +
-	((__t = (  opt.encodeHtml(value.title) )) == null ? '' : __t) +
-	'\r\n    </td>\r\n</tr>\r\n';
+	'</td>\r\n    <td>' +
+	((__t = ( opt.encodeHtml(value.title) )) == null ? '' : __t) +
+	'</td>\r\n</tr>\r\n';
 
-	})}
+	        });
+	    }
 	;
 	__p += '\r\n';
 
@@ -2198,7 +2225,7 @@ webpackJsonp([6],{
 
 /***/ },
 
-/***/ 120:
+/***/ 121:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {

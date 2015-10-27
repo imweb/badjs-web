@@ -5,6 +5,11 @@ var log4js = require('log4js'),
 
 var port = process.env.port;
 var service = process.env.service;
+var isDebug = process.env.debug == "false" ? false: true;
+
+if(isDebug){
+    logger.setLevel('DEBUG');
+}
 
 
 var filter = {};
@@ -53,6 +58,9 @@ var Worker = {
 
     _keepAliveMonitor : function (){
         var self = this;
+        if(this._monitorTimeoutId ){
+            clearInterval(this._monitorTimeoutId);
+        }
         this._monitorTimeoutId = setInterval(function (){
             var currentDate = new Date - 0;
             if(!self.wbClient._keepalive){
@@ -81,7 +89,11 @@ var Worker = {
                 case "STOP" : self.stopMonitor();  break;
                 default:break;
             }
-            logger.debug( "pid="+ process.pid + " , " +JSON.stringify(data));
+
+            if(isDebug ){
+                logger.debug( "pid="+ process.pid + " , " +JSON.stringify(data));
+            }
+
         });
     },
 
@@ -114,7 +126,7 @@ var Worker = {
     startMonitor :function (data){
         var self = this;
 
-        this.monitorKey = service+data.id ;
+        this.monitorKey = service+data.id+"|" ;
 
         this.zmqClient = zmq.socket('sub');
 

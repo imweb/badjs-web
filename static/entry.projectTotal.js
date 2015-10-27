@@ -3,13 +3,13 @@ webpackJsonp([10],{
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var projectTotal = __webpack_require__(14);
+	var projectTotal = __webpack_require__(16);
 
 	projectTotal.init();
 
 /***/ },
 
-/***/ 14:
+/***/ 16:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_w2ui, $, w2ui, _) {/**
@@ -18,8 +18,8 @@ webpackJsonp([10],{
 	 * */
 
 
-	__webpack_require__(20);
-	__webpack_require__(117);
+	__webpack_require__(22);
+	__webpack_require__(119);
 
 
 	var dayNumber = 0,
@@ -240,17 +240,16 @@ webpackJsonp([10],{
 	        records: data.data,
 
 	    });
-	    console.log(w2ui);
 	}
 
 
 	module.exports = statistics;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(5), __webpack_require__(20), __webpack_require__(4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22), __webpack_require__(5), __webpack_require__(22), __webpack_require__(4)))
 
 /***/ },
 
-/***/ 20:
+/***/ 22:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, jQuery) {/* w2ui 1.4.3 (c) http://w2ui.com, vitmalina@gmail.com */
@@ -268,16 +267,16 @@ webpackJsonp([10],{
 
 /***/ },
 
-/***/ 117:
+/***/ 119:
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(118);
+	var content = __webpack_require__(120);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(119)(content, {});
+	var update = __webpack_require__(122)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -295,10 +294,10 @@ webpackJsonp([10],{
 
 /***/ },
 
-/***/ 118:
+/***/ 120:
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(121)();
+	exports = module.exports = __webpack_require__(123)();
 	// imports
 
 
@@ -310,7 +309,7 @@ webpackJsonp([10],{
 
 /***/ },
 
-/***/ 119:
+/***/ 122:
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -536,7 +535,7 @@ webpackJsonp([10],{
 
 /***/ },
 
-/***/ 121:
+/***/ 123:
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

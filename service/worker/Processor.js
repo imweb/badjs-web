@@ -26,7 +26,7 @@ var log4js = require('log4js'),
     logger = log4js.getLogger();
 
 var Processor = function (){
-    this.worker = cluster.fork({port : port , service :service });
+    this.worker = cluster.fork({port : port , service :service , debug :  !!GLOBAL.DEBUG  });
     this.__pid__ = this.worker.process.pid;
 
 
@@ -96,6 +96,7 @@ Processor.prototype = {
         }else {
             logger.info("processor("+this.__pid__+") stop monitor " );
         }
+        this.worker.removeAllListeners();
         this.wbClient = null;
         this.eventEmitter.emit("destroy");
     },

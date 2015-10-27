@@ -219,5 +219,10 @@ pip-log.txt
 #############
 node_modules/
 coverage.html
-.*
 web-debug.bat
+
+
+#############
+## webstorm
+#############
+.idea/

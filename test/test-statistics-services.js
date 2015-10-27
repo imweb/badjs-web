@@ -1,7 +1,9 @@
+
 var mysql = require('mysql'),
     StatisticsService = require('../service/StatisticsService'),
     orm = require('orm');
 
+GLOBAL.pjconfig = require('../project.json');
 //GLOBAL.DEBUG = true;
 
 var mysql ="mysql://badjs:pass4badjs@10.198.30.62:4250/badjs";
@@ -26,7 +28,7 @@ orm.connect( mysql, function(err , db) {
     var aa = new StatisticsService();
 
 
-    var startDate = new Date('2014-12-23 00:00:00');
+    var startDate = new Date('2015-09-23 00:00:00');
     var nowDate = new Date;
 
     var fetch = function (id , startDate){
@@ -64,8 +66,6 @@ orm.connect( mysql, function(err , db) {
     //    }
     //},1000);
 });
-
-
 
 
 

@@ -9,6 +9,7 @@ var log4js = require('log4js'),
     _ = require('underscore'),
     logger = log4js.getLogger();
 
+var request = require("request");
 
 var LogService = function () {
 
@@ -18,15 +19,16 @@ var LogService = function () {
      this.queryUrl = 'http://10.143.132.205:9000/query';
      this.pushProjectUrl = 'http://10.143.132.205:9001/getProjects';
      //}*/
+    
 
     this.queryUrl = GLOBAL.pjconfig.storage.queryUrl;
-    this.queryCountUrl = GLOBAL.pjconfig.storage.queryCountUrl;
-    this.querySvgUrl = GLOBAL.pjconfig.storage.querySvgUrl;
     this.pushProjectUrl = GLOBAL.pjconfig.acceptor.pushProjectUrl;
+    this.querySvgUrl = GLOBAL.pjconfig.storage.querySvgUrl;
+    this.pushProjectUrl2 = GLOBAL.pjconfig.openapi.pushProjectUrl;
 
-    logger.debug('query url : ' + this.queryUrl)
-//    this.url = 'http://127.0.0.1:9000/query';
-}
+    // this.url = 'http://127.0.0.1:9000/query';
+    logger.debug('query url : ' + this.queryUrl);
+};
 
 
 LogService.prototype = {
@@ -71,8 +73,8 @@ LogService.prototype = {
 
         }).on('error', function (err) {
             logger.warn('error :' + err);
-            callback(err)
-        })
+            callback(err);
+        });
     },
     queryCount: function (params, callback) {
         this.query(params, callback, 'count');
@@ -83,57 +85,69 @@ LogService.prototype = {
     pushProject: function (callback) {
         var self = this;
 
-        callback || (callback = function () {
-        });
+        callback || (callback = function() {});
 
         var businessService = new BusinessService();
+        
+        var push = function() {
 
-        var tryTimes = 0;
-        var push = function () {
+            businessService.findBusiness(function(err, item) {
 
-            businessService.findBusiness(function (err, item) {
+                var projectsInfo = {};
 
-                var strParams = '';
-
-                _.each(item, function (value, ke) {
-                    strParams += value.id + "_";
+                _.each(item, function(value) {
+                    projectsInfo[value.id] = {id : value.id , url : value.url , appkey : value.appkey};
                 });
 
-                if (strParams.length > 0) {
-                    strParams = "projectsId=" + strParams.substring(0, strParams.length - 1) + "&";
-                }
-
-                strParams += "auth=badjsAccepter";
-
-
-                http.get(self.pushProjectUrl + '?' + strParams, function (res) {
-                    res
-                        .on('data', function () {
-                        })
-                        .on('end', function () {
-                            callback();
-                        })
-
-                }).on('error', function (err) {
-                    if (tryTimes <= 3) {
-                        tryTimes++;
-                        logger.warn('push project error and try:' + err);
-                        push();
-                    } else {
-                        logger.warn('push project error :' + err);
-                        callback(err)
+                var result = [0, 0];
+                
+                var resultCall = function() {
+                    if (result[0] < 0 && result[1] < 0) {
+                        callback(new Error("error"));
+                    } else if (result[0] > 0 && result[1] > 0) {
+                        callback();
                     }
+                };
 
+                request.post(self.pushProjectUrl, {
+                    form: {
+                        projectsInfo: JSON.stringify(projectsInfo),
+                        auth: "badjsAccepter"
+                    }
+                }, function(err) {
+                    if (err) {
+                        logger.warn('push projectIds to acceptor  error :' + err);
+                        result[0] = -1;
+                    } else {
+                        logger.info('push projectIds to acceptor  success');
+                        result[0] = 1;
+                    }
+                    resultCall();
+                });
 
-                })
+                request.post(self.pushProjectUrl2, {
+                    form: {
+                        projectsInfo: JSON.stringify(projectsInfo),
+                        auth: "badjsOpen"
+                    }
+                }, function(err) {
+                    if (err) {
+                        logger.warn('push projectIds to open  error :' + err);
+                        result[1] = -1;
+                    } else {
+                        logger.info('push projectIds to openapi success');
+                        result[1] = 1;
+                    }
+                    resultCall();
+                });
+
             });
-        }
+        };
 
         push();
 
     }
-}
+};
 
 
 module.exports = LogService;
-
