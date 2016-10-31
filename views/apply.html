@@ -36,6 +36,30 @@
 
 
                 </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">黑名单 <span style="color: red">*</span></label>
+                    <div class="col-sm-6">
+                        <textarea
+                            class="apply-blacklist form-control"
+                            rows="10"
+                            placeholder="需要屏蔽的IP和UA列表，通过正则表达式匹配"
+                        ><%=it.apply.blacklist%></textarea>
+                        <p class="input-tips">
+                            格式为标准的JSON,如下：
+                            <code>
+                                {
+                                    "ip" : [ "127\\.0\\.0\\.5"],
+                                    "ua": ["Baiduspider" , "Tencent_Security_Team" ]
+                                }
+                            </code>
+                            ip字段表示要屏蔽的ip列表,数组的每一项都是一个表示正则表达式的字符串。
+                            ua字段表示要屏蔽的ua列表,数组的每一项都是一个表示正则表达式的字符串。
+                            被匹配中的上报将会被拦截.
+                        </p>
+                    </div>
+                </div>
+
                 <!--<div class="form-group">-->
                 <!--<label class="col-sm-4 control-label">通知邮箱</label>-->
                 <!--<div class="col-sm-6">-->

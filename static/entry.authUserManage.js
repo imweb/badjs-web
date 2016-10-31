@@ -3,13 +3,13 @@ webpackJsonp([4],{
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var usermanger = __webpack_require__(10);
+	var usermanger = __webpack_require__(11);
 
 	usermanger.init();
 
 /***/ },
 
-/***/ 10:
+/***/ 11:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {/**
@@ -17,7 +17,7 @@ webpackJsonp([4],{
 	 * @author coverguo
 	 * */
 
-	var userTable = __webpack_require__(126);
+	var userTable = __webpack_require__(131);
 
 
 	    var encodeHtml = function (str) {
@@ -92,11 +92,11 @@ webpackJsonp([4],{
 	        }
 	}
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
 
-/***/ 126:
+/***/ 131:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {
@@ -118,29 +118,29 @@ webpackJsonp([4],{
 	        }
 	    }
 	;
-	__p += '\r\n<tr class="listRow">\r\n    <td>' +
+	__p += '\n<tr class="listRow">\n    <td>' +
 	((__t = ( i+1)) == null ? '' : __t) +
-	'</td>\r\n    <td>' +
+	'</td>\n    <td>' +
 	((__t = ( it[i].loginName)) == null ? '' : __t) +
-	'</td>\r\n    <td>' +
+	'</td>\n    <td>' +
 	((__t = ( it[i].chineseName?it[i].chineseName:"无")) == null ? '' : __t) +
-	'</td>\r\n    <td>' +
+	'</td>\n    <td>' +
 	((__t = ( it[i].email)) == null ? '' : __t) +
-	'</td>\r\n    <td>' +
+	'</td>\n    <td>' +
 	((__t = ( role)) == null ? '' : __t) +
-	' </td>\r\n    <td>\r\n        ';
+	' </td>\n    <td>\n        ';
 	if(operationType == 1 ){;
-	__p += '\r\n            <button class="user-authBtn btn-default modifyBtn" data-uaid="' +
+	__p += '\n            <button class="user-authBtn btn-default modifyBtn" data-uaid="' +
 	((__t = ( it[i].id)) == null ? '' : __t) +
-	'" data-role="0">转为普通成员</button>\r\n        ';
+	'" data-role="0">转为普通成员</button>\n        ';
 	} else if(operationType == 0) {;
-	__p += '\r\n            <button class="user-authBtn btn-default modifyBtn" data-uaid="' +
+	__p += '\n            <button class="user-authBtn btn-default modifyBtn" data-uaid="' +
 	((__t = ( it[i].id)) == null ? '' : __t) +
-	'" data-role="1" >授权管理员</button>\r\n        ';
+	'" data-role="1" >授权管理员</button>\n        ';
 	};
-	__p += '\r\n\r\n\r\n    </td>\r\n</tr>\r\n';
+	__p += '\n\n\n    </td>\n</tr>\n';
 	};
-	__p += '\r\n';
+	__p += '\n';
 
 	}
 	return __p

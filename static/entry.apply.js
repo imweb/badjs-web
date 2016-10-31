@@ -1,4 +1,4 @@
-webpackJsonp([1],{
+webpackJsonp([10],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
@@ -20,7 +20,7 @@ webpackJsonp([1],{
 	var REG_REFERER = /^https?:\/\/[^\/]+\//i;
 	var REG_DOMAIN_STAR = /^\*(\.[^\/]+)?$/;
 
-	var Dialog = __webpack_require__(21);
+	var Dialog = __webpack_require__(126);
 
 
 	var applyBox = $("#applyContainer");
@@ -38,12 +38,21 @@ webpackJsonp([1],{
 	            return;
 	        }
 
+	        var blacklist = $('.apply-blacklist').val();
+	        try{
+	            JSON.parse(blacklist);
+	        }catch (e){
+	            alert("请填写合法的JSON");
+	            return;
+	        }
+
 	        var params = {};
 	        //申请数据
 	        $.extend(params, {
 	            name: $('.apply-name').val(),
 	            description: $('.apply-description').val(),
 	            url: mainpage,
+	            blacklist: blacklist,
 	            id: $("#applyId").val()
 	        });
 
@@ -72,11 +81,12 @@ webpackJsonp([1],{
 	module.exports = {
 	    init: init
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
 
-/***/ 20:
+/***/ 21:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {/**
@@ -252,15 +262,15 @@ webpackJsonp([1],{
 
 	module.exports = Delegator;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
 
-/***/ 21:
+/***/ 126:
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(20);
-	var modal = __webpack_require__(134);
+	/* WEBPACK VAR INJECTION */(function($) {var Delegator = __webpack_require__(21);
+	var modal = __webpack_require__(138);
 
 	    var container;
 
@@ -304,11 +314,11 @@ webpackJsonp([1],{
 	    Dialog.hide = hide;
 
 	module.exports =  Dialog;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
 
-/***/ 134:
+/***/ 138:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function (obj) {
@@ -317,11 +327,11 @@ webpackJsonp([1],{
 	with (obj) {
 	__p += '<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="' +
 	((__t = (it.id || '' )) == null ? '' : __t) +
-	'">\r\n  <div class="modal-backdrop fade"></div>\r\n  <div class="modal-dialog">\r\n    <div class="modal-content">\r\n\r\n      <div class="modal-header">\r\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true" data-event-click="close">×</span><span class="sr-only">Close</span></button>\r\n        <h4 class="modal-title">' +
+	'">\n  <div class="modal-backdrop fade"></div>\n  <div class="modal-dialog">\n    <div class="modal-content">\n\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true" data-event-click="close">×</span><span class="sr-only">Close</span></button>\n        <h4 class="modal-title">' +
 	((__t = (it.header)) == null ? '' : __t) +
-	'</h4>\r\n      </div>\r\n      <div class="modal-body">\r\n        ' +
+	'</h4>\n      </div>\n      <div class="modal-body">\n        ' +
 	((__t = (it.body)) == null ? '' : __t) +
-	'\r\n      </div>\r\n      <div class="modal-footer">\r\n        <button type="button" class="btn btn-default" data-event-click="close">Close</button>\r\n      </div>\r\n\r\n    </div>\r\n  </div>\r\n</div>';
+	'\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-event-click="close">Close</button>\n      </div>\n\n    </div>\n  </div>\n</div>';
 
 	}
 	return __p
