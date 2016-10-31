@@ -24,12 +24,21 @@ function bindEvent() {
             return;
         }
 
+        var blacklist = $('.apply-blacklist').val();
+        try{
+            JSON.parse(blacklist);
+        }catch (e){
+            alert("请填写合法的JSON");
+            return;
+        }
+
         var params = {};
         //申请数据
         $.extend(params, {
             name: $('.apply-name').val(),
             description: $('.apply-description').val(),
             url: mainpage,
+            blacklist: blacklist,
             id: $("#applyId").val()
         });
 

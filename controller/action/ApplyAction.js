@@ -21,6 +21,9 @@ var log4js = require('log4js'),
         return false;
     };
 
+var LogService = require("../../service/LogService");
+var logService = new LogService();
+
 var REG_DOMAIN_STAR = /^\*(\.[^\/]+)?$/;
 var REG_REFERER = /^https?:\/\/[^\/]+\//i;
 
@@ -53,6 +56,18 @@ var applyAction = {
             return;
         }
 
+        // 校验blacklist
+        var blacklist = params.blacklist;
+        try {
+            JSON.parse(blacklist);
+        }catch (e){
+            res.json({
+                ret: 1002,
+                msg: "blacklist 不是合法的JSON"
+            });
+            return;
+        }
+
         var apply = params;
         apply.userName = params.user.loginName;
 
@@ -66,6 +81,7 @@ var applyAction = {
                     ret: 0,
                     msg: "success-add"
                 });
+                logService.pushProject();
             });
         } else {
             apply.status = 0;
@@ -79,6 +95,7 @@ var applyAction = {
                     ret: 0,
                     msg: "success-add"
                 });
+                logService.pushProject();
             });
         }
 
