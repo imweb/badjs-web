@@ -467,6 +467,10 @@ form
 {
     background: url(/static/img/ico-wx.png) no-repeat;
 }
+#content .mid-side .main-table .ico-now
+{
+    background: url(/static/img/ico-now.png) no-repeat;
+}
 #content .mid-side .main-table .ico-windows
  {
      background: url(/static/img/ico-windows.png) no-repeat;

@@ -2607,6 +2607,8 @@ webpackJsonp([10],{
 	        browserIcon = 'ico-ff';
 	    } else if (ua.indexOf('safari') > -1) {
 	        browserIcon = 'ico-safari';
+	    } else if (ua.indexOf('now') > -1) {
+	        browserIcon = 'ico-now';
 	    }
 
 	    return [osIcon, browserIcon];
